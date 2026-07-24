@@ -1,0 +1,5 @@
+﻿Model,Type,Params (M),FLOPs (G),Standard Acc (Primary),Standard F1 (Primary),Historic F1,Other F1,Overall Acc,Speed (ms)
+ResNet-50,CNN (baseline),25.6,4.1,0.3415,0.3356,0.0000,0.0000,0.3415,127.6
+ViT-B/16,Transformer (flat),86.0,17.6,0.3990,0.3887,0.0000,0.0000,0.3990,404.5
+DINOv2-S,Transformer (self-sup.),22.0,4.6,0.4340,0.4103,0.0000,0.0000,0.4340,154.1
+Swin-V2-T,Transformer (hierarchical),28.0,4.5,0.3665,0.3680,0.0000,0.0000,0.3665,188.8

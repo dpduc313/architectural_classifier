@@ -9,7 +9,12 @@ raw_data/
 processed_data/
 
 # Temporary directories and caches
-.tmp/
+.tmp/**/*
+!.tmp/**/
+!.tmp/**/*.csv
+!.tmp/**/*.json
+!.tmp/*.csv
+!.tmp/*.json
 .ipynb_checkpoints/
 __pycache__/
 *.pyc

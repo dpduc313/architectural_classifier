@@ -1,0 +1,48 @@
+{
+  "model": "vit",
+  "primary_standard": {
+    "num_images": 2000,
+    "accuracy": 0.399,
+    "macro_f1": 0.3887,
+    "weighted_f1": 0.3887
+  },
+  "test_subsets": {
+    "Standard (Primary Focus)": {
+      "num_images": 2000,
+      "accuracy": 0.399,
+      "macro_f1": 0.3887,
+      "weighted_f1": 0.3887
+    }
+  },
+  "test_accuracy": 0.399,
+  "macro_f1": 0.3887,
+  "weighted_f1": 0.3887,
+  "ms_per_image": 404.48,
+  "num_test_images": 2000,
+  "per_class": {
+    "A1": {
+      "precision": 0.5193,
+      "recall": 0.51,
+      "f1": 0.5146,
+      "support": 500.0
+    },
+    "A2": {
+      "precision": 0.436,
+      "recall": 0.484,
+      "f1": 0.4588,
+      "support": 500.0
+    },
+    "B1": {
+      "precision": 0.3348,
+      "recall": 0.444,
+      "f1": 0.3818,
+      "support": 500.0
+    },
+    "B2": {
+      "precision": 0.2715,
+      "recall": 0.158,
+      "f1": 0.1997,
+      "support": 500.0
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "model": "swinv2",
+  "primary_standard": {
+    "num_images": 2000,
+    "accuracy": 0.3665,
+    "macro_f1": 0.368,
+    "weighted_f1": 0.368
+  },
+  "test_subsets": {
+    "Standard (Primary Focus)": {
+      "num_images": 2000,
+      "accuracy": 0.3665,
+      "macro_f1": 0.368,
+      "weighted_f1": 0.368
+    }
+  },
+  "test_accuracy": 0.3665,
+  "macro_f1": 0.368,
+  "weighted_f1": 0.368,
+  "ms_per_image": 188.82,
+  "num_test_images": 2000,
+  "per_class": {
+    "A1": {
+      "precision": 0.5073,
+      "recall": 0.348,
+      "f1": 0.4128,
+      "support": 500.0
+    },
+    "A2": {
+      "precision": 0.4197,
+      "recall": 0.486,
+      "f1": 0.4504,
+      "support": 500.0
+    },
+    "B1": {
+      "precision": 0.3289,
+      "recall": 0.348,
+      "f1": 0.3382,
+      "support": 500.0
+    },
+    "B2": {
+      "precision": 0.2587,
+      "recall": 0.284,
+      "f1": 0.2707,
+      "support": 500.0
+    }
+  }
+}
