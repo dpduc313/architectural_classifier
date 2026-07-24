@@ -1,0 +1,24 @@
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# Data directories (large folders)
+raw_data/
+processed_data/
+
+# Temporary directories and caches
+.tmp/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Large zip archives
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
