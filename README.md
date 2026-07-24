@@ -73,3 +73,18 @@ Ensure the virtual environment is activated, then run the scripts in sequence:
 ```powershell
 .venv\Scripts\python.exe execution/<script_name>.py
 ```
+
+## Future Work & Optimization Directions
+
+For the next stage of development to maximize model performance and utilize hardware efficiently, the following optimizations are planned:
+
+1. **Data Augmentation**:
+   - Integrate advanced augmentation strategies such as **Mixup**, **CutMix**, **RandAugment**, and **ColorJitter** to improve generalization against real-world variations (weather, shadows, angles).
+2. **Training Optimization**:
+   - Implement **Cosine Annealing Learning Rate Schedulers** with a warmup phase.
+   - Use **Layer-wise Learning Rate Decay (LLRD)** for Transformer-based architectures.
+   - Apply weight decay and Stochastic Depth to prevent overfitting on the patch dataset.
+3. **Parallel Processing & Acceleration**:
+   - Enable **Automatic Mixed Precision (AMP / FP16)** to reduce memory consumption and accelerate training on GPUs.
+   - Utilize PyTorch **Distributed Data Parallel (DDP)** for multi-GPU setups.
+

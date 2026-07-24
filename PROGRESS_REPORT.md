@@ -231,7 +231,24 @@ Bản đồ nhiệt Grad-CAM giúp minh họa chính xác các vùng không gian
 3. **Đánh giá & Tổng hợp**:
    - Sau khi hoàn tất 2 giai đoạn huấn luyện (Phase 1 & Phase 2) cho `effnet` và `convnext`, chạy `.venv\Scripts\python.exe execution/training/evaluate.py` và `.venv\Scripts\python.exe execution/training/compare_models.py` để cập nhật bảng so sánh 6 mô hình.
 
-### 5.3. Các file kết quả được lưu trữ
+### 5.3. Định hướng nghiên cứu và tối ưu hóa trong tương lai (Giai đoạn tiếp theo)
+
+Để cải thiện hơn nữa hiệu năng của các mô hình và tối ưu hóa tài nguyên phần cứng, các hướng phát triển tiếp theo bao gồm:
+
+1. **Áp dụng các kỹ thuật Tăng cường dữ liệu (Data Augmentation)**:
+   - Hiện tại bài toán mới chỉ sử dụng các phép tiền xử lý chuẩn hóa cơ bản. Trong giai đoạn tiếp theo, cần nhúng thêm các kỹ thuật nâng cao như **Mixup**, **CutMix**, **RandAugment**, **ColorJitter** và **Random Erasing** nhằm tăng khả năng tổng quát hóa của mô hình đối với các yếu tố ngoại cảnh thực tế (góc chụp, bóng đổ, thời tiết, ánh sáng khác nhau).
+
+2. **Phương pháp Tối ưu hóa quá trình Huấn luyện**:
+   - Áp dụng chính sách suy hao tốc độ học **Cosine Annealing LR Scheduler** với chu kỳ khởi động ấm (Warmup epochs).
+   - Sử dụng kỹ thuật **Layer-wise Learning Rate Decay (LLRD)** cho các mô hình dạng Transformer (ViT, Swin) để tối ưu việc cập nhật trọng số ở các lớp khác nhau.
+   - Thử nghiệm các bộ tối ưu nâng cao như **AdamW** đi kèm kiểm soát **Weight Decay** chặt chẽ để chống overfitting.
+
+3. **Song song hóa và Tăng tốc phần cứng**:
+   - Tích hợp kỹ thuật huấn luyện với độ chính xác hỗn hợp tự động **AMP (Automatic Mixed Precision - FP16)** để giảm 50% dung lượng VRAM và tăng tốc độ train trên GPU.
+   - Sử dụng **PyTorch Distributed Data Parallel (DDP)** để phân tán huấn luyện song song đa tiến trình trên các hệ thống có nhiều GPU (Multi-GPU), giúp rút ngắn thời gian huấn luyện tổng thể.
+
+
+### 5.4. Các file kết quả được lưu trữ
 
 - `model_comparison.csv`: `.tmp/results/model_comparison.csv`
 - `all_results_summary.json`: `.tmp/results/all_results_summary.json`
