@@ -29,7 +29,14 @@ sys.path.insert(0, str(Path(__file__).parent))
 from dataset import HeritageDataset, get_class_weights, MODEL_INPUT_SIZES, MODEL_NORM_STATS, CLASSES
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
-PROJECT_ROOT   = Path(__file__).parent.parent.parent
+def get_project_root():
+    root = Path(__file__).parent.parent.parent
+    # If parent dirs resolve to system root or flat Colab root, default to current working directory
+    if str(root.resolve()) in ["/", "/content", "C:\\", "D:\\"]:
+        return Path(".")
+    return root
+
+PROJECT_ROOT   = get_project_root()
 PROCESSED_DIR  = PROJECT_ROOT / "processed_data"
 CHECKPOINT_DIR = PROJECT_ROOT / ".tmp" / "checkpoints"
 LOG_DIR        = PROJECT_ROOT / ".tmp" / "logs"
