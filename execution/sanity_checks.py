@@ -1,11 +1,13 @@
 import os
 import pandas as pd
 
-processed_manifest_path = r"c:\Users\teflo\Desktop\Study\VLU\Comp vision\BT\Final\.tmp\processed_manifest.csv"
+from pathlib import Path
+project_root = Path(__file__).parent.parent
+processed_manifest_path = project_root / ".tmp" / "processed_manifest.csv"
 
 def run_sanity_checks():
-    if not os.path.exists(processed_manifest_path):
-        print(f"Error: Processed manifest not found at {processed_manifest_path}. Run preprocess_images.py first.")
+    if not processed_manifest_path.exists():
+        print(f"Error: Processed manifest not found at {processed_manifest_path.resolve()}. Run preprocess_images.py first.")
         return
 
     df = pd.read_csv(processed_manifest_path)
@@ -49,11 +51,11 @@ def run_sanity_checks():
 
     print("\n--- 4. FILE READABILITY CHECK ---")
     missing_files = []
-    project_root = os.path.dirname(os.path.dirname(processed_manifest_path))
+    proj_root = processed_manifest_path.parent.parent
     for idx, row in df.iterrows():
-        full_path = os.path.join(project_root, row['processed_path'])
-        if not os.path.exists(full_path):
-            missing_files.append(full_path)
+        full_path = proj_root / row['processed_path']
+        if not full_path.exists():
+            missing_files.append(str(full_path))
 
     if missing_files:
         print(f"  [FAIL] Found {len(missing_files)} missing processed files! First 5: {missing_files[:5]}")
