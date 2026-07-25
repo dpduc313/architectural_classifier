@@ -45,15 +45,26 @@ MODEL_REGISTRY = {
 }
 
 # ── Hyperparameters ────────────────────────────────────────────────────────────
-PHASE1_EPOCHS = 2     # backbone frozen, head only
-PHASE2_EPOCHS = 3     # full fine-tune
-HEAD_LR       = 1e-3
-BACKBONE_LR   = 1e-4
+PHASE1_EPOCHS = 2       # backbone frozen, head only
+PHASE2_EPOCHS = 10      # full fine-tune (increased from 3)
+PHASE1_LR     = 1e-3
 WEIGHT_DECAY  = 0.05
 BATCH_SIZE_GPU = 32
 BATCH_SIZE_CPU = 8
-NUM_WORKERS    = 0    # set 0 on Windows to avoid DataLoader fork issues
+NUM_WORKERS    = 2 if os.name != "nt" else 0  # Use multiprocessing on Linux/Kaggle
 NUM_CLASSES    = len(CLASSES)
+
+# Fine-tuned learning rates for Phase 2 (head_lr, backbone_lr)
+# Transformers need lower learning rates to prevent catastrophic forgetting
+MODEL_LRS = {
+    "swinv2":   (2e-4, 2e-5),
+    "vit":      (1e-4, 1e-5),
+    "dinov2":   (1e-4, 1e-5),
+    "resnet50": (5e-4, 5e-5),
+    "effnet":   (5e-4, 5e-5),
+    "convnext": (2e-4, 2e-5),
+}
+
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -88,21 +99,28 @@ def unfreeze_all(model: nn.Module):
 
 def get_optimizer(model: nn.Module, model_key: str, phase: int) -> torch.optim.Optimizer:
     """Return optimizer with separate LR groups for head vs backbone (phase 2)."""
-    head_names = {"head", "fc", "classifier"}
+    head_names = {"head", "fc", "classifier", "head.fc"}
 
     if phase == 1:
         params = [p for p in model.parameters() if p.requires_grad]
-        return torch.optim.AdamW(params, lr=HEAD_LR, weight_decay=WEIGHT_DECAY)
+        return torch.optim.AdamW(params, lr=PHASE1_LR, weight_decay=WEIGHT_DECAY)
     else:
+        head_lr, backbone_lr = MODEL_LRS.get(model_key, (1e-3, 1e-4))
         head_params, backbone_params = [], []
         for name, param in model.named_parameters():
-            if name.split(".")[0] in head_names:
+            # Check if name contains head patterns
+            is_head = False
+            for hn in head_names:
+                if hn in name:
+                    is_head = True
+                    break
+            if is_head:
                 head_params.append(param)
             else:
                 backbone_params.append(param)
         return torch.optim.AdamW([
-            {"params": head_params,     "lr": HEAD_LR},
-            {"params": backbone_params, "lr": BACKBONE_LR},
+            {"params": head_params,     "lr": head_lr},
+            {"params": backbone_params, "lr": backbone_lr},
         ], weight_decay=WEIGHT_DECAY)
 
 
@@ -229,6 +247,9 @@ def train(model_key: str, max_samples_per_class: int = None):
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer, T_max=PHASE2_EPOCHS)
 
+    patience = 3
+    epochs_no_improve = 0
+
     for epoch in range(1, PHASE2_EPOCHS + 1):
         t0 = time.time()
         tr_loss, tr_acc = run_epoch(model, train_loader, criterion, optimizer,
@@ -244,13 +265,21 @@ def train(model_key: str, max_samples_per_class: int = None):
 
         if va_acc > best_val_acc:
             best_val_acc = va_acc
+            epochs_no_improve = 0
             torch.save({"epoch": epoch, "phase": 2,
                         "model_state": model.state_dict(),
                         "val_acc": va_acc}, checkpoint_path)
             print(f"  [BEST] New best val_acc={va_acc:.4f} - checkpoint saved.")
+        else:
+            epochs_no_improve += 1
+            print(f"  No validation improvement for {epochs_no_improve} epoch(s).")
 
         log_rows.append({"phase": 2, "epoch": epoch, "train_loss": tr_loss,
                          "train_acc": tr_acc, "val_loss": va_loss, "val_acc": va_acc})
+
+        if epochs_no_improve >= patience:
+            print(f"  Early stopping triggered after {epoch} epochs in Phase 2.")
+            break
 
     # ─────────────────────────────────────────────────
     # Save log
