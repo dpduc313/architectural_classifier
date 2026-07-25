@@ -119,7 +119,7 @@ def run_epoch(model, loader, criterion, optimizer, device, scaler, is_train: boo
             if is_train:
                 optimizer.zero_grad()
                 if scaler:
-                    with torch.cuda.amp.autocast():
+                    with torch.amp.autocast('cuda'):
                         logits = model(images)
                         loss = criterion(logits, labels)
                     scaler.scale(loss).backward()
@@ -163,7 +163,7 @@ def train(model_key: str, max_samples_per_class: int = None):
     input_size  = MODEL_INPUT_SIZES[model_key]
     norm_mean, norm_std = MODEL_NORM_STATS[model_key]
     batch_size  = BATCH_SIZE_GPU if device.type == "cuda" else BATCH_SIZE_CPU
-    scaler      = torch.cuda.amp.GradScaler() if device.type == "cuda" else None
+    scaler      = torch.amp.GradScaler("cuda") if device.type == "cuda" else None
 
     # ── Datasets ──
     train_ds = HeritageDataset(PROCESSED_DIR, "train", input_size, norm_mean, norm_std,
