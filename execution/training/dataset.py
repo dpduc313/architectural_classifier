@@ -104,7 +104,10 @@ class HeritageDataset(Dataset):
             class_dir = split_dir / class_name
             if not class_dir.exists():
                 continue
-            imgs = sorted(class_dir.glob("*.jpg"))
+            imgs = []
+            for ext in ["*.jpg", "*.jpeg", "*.png", "*.JPG", "*.JPEG", "*.PNG"]:
+                imgs.extend(class_dir.glob(ext))
+            imgs = sorted(imgs)
             if max_samples_per_class is not None and len(imgs) > max_samples_per_class:
                 # Subsample deterministically with fixed step stride for even coverage across buildings
                 step = len(imgs) / max_samples_per_class

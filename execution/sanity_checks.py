@@ -53,7 +53,8 @@ def run_sanity_checks():
     missing_files = []
     proj_root = processed_manifest_path.parent.parent
     for idx, row in df.iterrows():
-        full_path = proj_root / row['processed_path']
+        path_str = str(row['processed_path']).replace('\\', '/')
+        full_path = proj_root / path_str
         if not full_path.exists():
             missing_files.append(str(full_path))
 
