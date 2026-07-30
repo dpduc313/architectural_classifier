@@ -1,0 +1,48 @@
+{
+  "model": "effnet",
+  "primary_standard": {
+    "num_images": 13559,
+    "accuracy": 0.4814,
+    "macro_f1": 0.4526,
+    "weighted_f1": 0.4548
+  },
+  "test_subsets": {
+    "Standard (Primary Focus)": {
+      "num_images": 13559,
+      "accuracy": 0.4814,
+      "macro_f1": 0.4526,
+      "weighted_f1": 0.4548
+    }
+  },
+  "test_accuracy": 0.4814,
+  "macro_f1": 0.4526,
+  "weighted_f1": 0.4548,
+  "ms_per_image": 4.27,
+  "num_test_images": 13559,
+  "per_class": {
+    "A1": {
+      "precision": 0.4295,
+      "recall": 0.8642,
+      "f1": 0.5738,
+      "support": 2975.0
+    },
+    "A2": {
+      "precision": 0.4176,
+      "recall": 0.3949,
+      "f1": 0.4059,
+      "support": 1527.0
+    },
+    "B1": {
+      "precision": 0.5617,
+      "recall": 0.5096,
+      "f1": 0.5344,
+      "support": 4861.0
+    },
+    "B2": {
+      "precision": 0.5096,
+      "recall": 0.2088,
+      "f1": 0.2962,
+      "support": 4196.0
+    }
+  }
+}

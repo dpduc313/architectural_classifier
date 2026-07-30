@@ -1,48 +1,48 @@
 {
   "model": "swinv2",
   "primary_standard": {
-    "num_images": 2000,
-    "accuracy": 0.3665,
-    "macro_f1": 0.368,
-    "weighted_f1": 0.368
+    "num_images": 53742,
+    "accuracy": 0.4245,
+    "macro_f1": 0.3736,
+    "weighted_f1": 0.3705
   },
   "test_subsets": {
     "Standard (Primary Focus)": {
-      "num_images": 2000,
-      "accuracy": 0.3665,
-      "macro_f1": 0.368,
-      "weighted_f1": 0.368
+      "num_images": 53742,
+      "accuracy": 0.4245,
+      "macro_f1": 0.3736,
+      "weighted_f1": 0.3705
     }
   },
-  "test_accuracy": 0.3665,
-  "macro_f1": 0.368,
-  "weighted_f1": 0.368,
-  "ms_per_image": 188.82,
-  "num_test_images": 2000,
+  "test_accuracy": 0.4245,
+  "macro_f1": 0.3736,
+  "weighted_f1": 0.3705,
+  "ms_per_image": 4.48,
+  "num_test_images": 53742,
   "per_class": {
     "A1": {
-      "precision": 0.5073,
-      "recall": 0.348,
-      "f1": 0.4128,
-      "support": 500.0
+      "precision": 0.3944,
+      "recall": 0.8598,
+      "f1": 0.5407,
+      "support": 12898.0
     },
     "A2": {
-      "precision": 0.4197,
-      "recall": 0.486,
-      "f1": 0.4504,
-      "support": 500.0
+      "precision": 0.4531,
+      "recall": 0.2379,
+      "f1": 0.312,
+      "support": 6776.0
     },
     "B1": {
-      "precision": 0.3289,
-      "recall": 0.348,
-      "f1": 0.3382,
-      "support": 500.0
+      "precision": 0.4424,
+      "recall": 0.5001,
+      "f1": 0.4695,
+      "support": 16662.0
     },
     "B2": {
-      "precision": 0.2587,
-      "recall": 0.284,
-      "f1": 0.2707,
-      "support": 500.0
+      "precision": 0.5505,
+      "recall": 0.1021,
+      "f1": 0.1723,
+      "support": 17406.0
     }
   }
 }

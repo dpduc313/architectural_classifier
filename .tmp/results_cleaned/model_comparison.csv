@@ -1,0 +1,7 @@
+﻿Model,Type,Params (M),FLOPs (G),Train Acc (Best),Standard Acc (Primary),Standard F1 (Primary),Historic F1,Other F1,Overall Acc,Speed (ms)
+ResNet-50,CNN (baseline),25.6,4.1,0.8442,0.5172,0.4950,0.0000,0.0000,0.5172,4.3
+ViT-B/16,Transformer (flat),86.0,17.6,0.9542,0.4354,0.4042,0.0000,0.0000,0.4354,7.4
+DINOv2-S,Transformer (self-sup.),22.0,4.6,0.6762,0.5220,0.4980,0.0000,0.0000,0.5220,4.2
+Swin-V2-T,Transformer (hierarchical),28.0,4.5,0.9401,0.4289,0.3877,0.0000,0.0000,0.4289,6.7
+EfficientNet-V2-S,CNN (Fused-MBConv),21.5,2.9,0.9376,0.4814,0.4526,0.0000,0.0000,0.4814,4.3
+ConvNeXt-Tiny,Modern CNN (Depthwise 7x7),28.6,4.5,0.9949,0.4442,0.3964,0.0000,0.0000,0.4442,4.3

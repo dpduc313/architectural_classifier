@@ -58,7 +58,7 @@ PHASE1_LR     = 1e-3
 WEIGHT_DECAY  = 0.05
 BATCH_SIZE_GPU = 32
 BATCH_SIZE_CPU = 8
-NUM_WORKERS    = 2 if os.name != "nt" else 0  # Use multiprocessing on Linux/Kaggle
+NUM_WORKERS    = 4  # Use multiprocessing for faster data loading
 NUM_CLASSES    = len(CLASSES)
 
 # Fine-tuned learning rates for Phase 2 (head_lr, backbone_lr)
@@ -173,13 +173,19 @@ def run_epoch(model, loader, criterion, optimizer, device, scaler, is_train: boo
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-def train(model_key: str, max_samples_per_class: int = None):
-    CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
-    LOG_DIR.mkdir(parents=True, exist_ok=True)
+def train(model_key: str, max_samples_per_class: int = None, data_dir: str = None, checkpoint_dir: str = None, log_dir: str = None):
+    # Resolve paths
+    data_dir_path = Path(data_dir) if data_dir else PROCESSED_DIR
+    checkpoint_dir_path = Path(checkpoint_dir) if checkpoint_dir else CHECKPOINT_DIR
+    log_dir_path = Path(log_dir) if log_dir else LOG_DIR
+
+    checkpoint_dir_path.mkdir(parents=True, exist_ok=True)
+    log_dir_path.mkdir(parents=True, exist_ok=True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"\n{'='*60}")
     print(f"Model : {model_key}  |  Device: {device}")
+    print(f"Data Dir: {data_dir_path}")
     if device.type == "cpu" and max_samples_per_class is None:
         max_samples_per_class = 1000
         print(f"Running on CPU: defaulting max_samples_per_class to {max_samples_per_class} per class for speed.")
@@ -191,9 +197,9 @@ def train(model_key: str, max_samples_per_class: int = None):
     scaler      = torch.amp.GradScaler("cuda") if device.type == "cuda" else None
 
     # ── Datasets ──
-    train_ds = HeritageDataset(PROCESSED_DIR, "train", input_size, norm_mean, norm_std,
+    train_ds = HeritageDataset(data_dir_path, "train", input_size, norm_mean, norm_std,
                                max_samples_per_class=max_samples_per_class)
-    val_ds   = HeritageDataset(PROCESSED_DIR, "val",   input_size, norm_mean, norm_std,
+    val_ds   = HeritageDataset(data_dir_path, "val",   input_size, norm_mean, norm_std,
                                max_samples_per_class=max_samples_per_class)
 
     class_weights = get_class_weights(train_ds).to(device)
@@ -207,8 +213,8 @@ def train(model_key: str, max_samples_per_class: int = None):
     # ── Model ──
     model = build_model(model_key).to(device)
 
-    checkpoint_path = CHECKPOINT_DIR / f"{model_key}_best.pt"
-    log_path        = LOG_DIR / f"{model_key}_train_log.csv"
+    checkpoint_path = checkpoint_dir_path / f"{model_key}_best.pt"
+    log_path        = log_dir_path / f"{model_key}_train_log.csv"
 
     best_val_acc = 0.0
     log_rows: list[dict] = []
@@ -308,7 +314,7 @@ if __name__ == "__main__":
         "--model",
         choices=list(MODEL_REGISTRY.keys()),
         required=True,
-        help="Which model to train: swinv2 | vit | dinov2 | resnet50",
+        help="Which model to train: swinv2 | vit | dinov2 | resnet50 | effnet | convnext",
     )
     parser.add_argument(
         "--max-samples-per-class",
@@ -316,5 +322,29 @@ if __name__ == "__main__":
         default=None,
         help="Maximum patches per class for training/val (useful for faster CPU execution).",
     )
+    parser.add_argument(
+        "--data-dir",
+        type=str,
+        default=None,
+        help="Custom path to processed_data directory",
+    )
+    parser.add_argument(
+        "--checkpoint-dir",
+        type=str,
+        default=None,
+        help="Custom path to checkpoints directory",
+    )
+    parser.add_argument(
+        "--log-dir",
+        type=str,
+        default=None,
+        help="Custom path to logs directory",
+    )
     args = parser.parse_args()
-    train(args.model, max_samples_per_class=args.max_samples_per_class)
+    train(
+        args.model,
+        max_samples_per_class=args.max_samples_per_class,
+        data_dir=args.data_dir,
+        checkpoint_dir=args.checkpoint_dir,
+        log_dir=args.log_dir
+    )

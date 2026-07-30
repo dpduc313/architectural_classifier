@@ -104,9 +104,14 @@ class HeritageDataset(Dataset):
             class_dir = split_dir / class_name
             if not class_dir.exists():
                 continue
+            seen = set()
             imgs = []
             for ext in ["*.jpg", "*.jpeg", "*.png", "*.JPG", "*.JPEG", "*.PNG"]:
-                imgs.extend(class_dir.glob(ext))
+                for img_path in class_dir.glob(ext):
+                    canonical_name = img_path.name.lower()
+                    if canonical_name not in seen:
+                        seen.add(canonical_name)
+                        imgs.append(img_path)
             imgs = sorted(imgs)
             if max_samples_per_class is not None and len(imgs) > max_samples_per_class:
                 # Subsample deterministically with fixed step stride for even coverage across buildings
@@ -143,7 +148,7 @@ def get_class_weights(dataset: HeritageDataset) -> torch.Tensor:
     Helps with class imbalance.
     """
     counts = torch.zeros(len(CLASSES))
-    for _, label, _ in dataset:
+    for _, label in dataset.samples:
         counts[label] += 1
     weights = 1.0 / counts.clamp(min=1)
     weights = weights / weights.sum() * len(CLASSES)

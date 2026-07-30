@@ -49,8 +49,13 @@ def load_model(model_key: str, checkpoint_path: Path, device: torch.device) -> n
     return model
 
 
-def evaluate_model(model_key: str, device: torch.device, max_samples_per_class: int = None):
-    checkpoint_path = CHECKPOINT_DIR / f"{model_key}_best.pt"
+def evaluate_model(model_key: str, device: torch.device, max_samples_per_class: int = None, data_dir: str = None, checkpoint_dir: str = None, results_dir: str = None):
+    # Resolve directory paths
+    data_dir_path = Path(data_dir) if data_dir else PROCESSED_DIR
+    checkpoint_dir_path = Path(checkpoint_dir) if checkpoint_dir else CHECKPOINT_DIR
+    results_dir_path = Path(results_dir) if results_dir else RESULTS_DIR
+
+    checkpoint_path = checkpoint_dir_path / f"{model_key}_best.pt"
     if not checkpoint_path.exists():
         print(f"[SKIP] No checkpoint for '{model_key}'. Run train.py first.")
         return None
@@ -63,7 +68,7 @@ def evaluate_model(model_key: str, device: torch.device, max_samples_per_class: 
     norm_mean, norm_std = MODEL_NORM_STATS[model_key]
     batch_size  = BATCH_SIZE_GPU if device.type == "cuda" else BATCH_SIZE_CPU
 
-    test_ds = HeritageDataset(PROCESSED_DIR, "test", input_size, norm_mean, norm_std,
+    test_ds = HeritageDataset(data_dir_path, "test", input_size, norm_mean, norm_std,
                              max_samples_per_class=max_samples_per_class)
     test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False,
                              num_workers=NUM_WORKERS)
@@ -154,16 +159,16 @@ def evaluate_model(model_key: str, device: torch.device, max_samples_per_class: 
         } for cls in CLASSES},
     }
 
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    results_dir_path.mkdir(parents=True, exist_ok=True)
 
     # Save metrics JSON
-    metrics_path = RESULTS_DIR / f"{model_key}_metrics.json"
+    metrics_path = results_dir_path / f"{model_key}_metrics.json"
     with open(metrics_path, "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=2)
 
     # Save confusion matrix CSV
     cm_df = pd.DataFrame(cm, index=CLASSES, columns=CLASSES)
-    cm_path = RESULTS_DIR / f"{model_key}_confusion.csv"
+    cm_path = results_dir_path / f"{model_key}_confusion.csv"
     cm_df.to_csv(cm_path, encoding="utf-8-sig")
 
     # Save misclassified examples
@@ -174,7 +179,7 @@ def evaluate_model(model_key: str, device: torch.device, max_samples_per_class: 
         if t != pr
     ]
     mis_df = pd.DataFrame(misclassified)
-    mis_path = RESULTS_DIR / f"{model_key}_misclassified.csv"
+    mis_path = results_dir_path / f"{model_key}_misclassified.csv"
     mis_df.to_csv(mis_path, index=False, encoding="utf-8-sig")
 
     print(f"\n  [PRIMARY FOCUS] Standardized Buildings Acc={primary_std['accuracy']:.4f}  F1={primary_std['macro_f1']:.4f} ({primary_std['num_images']} patches)")
@@ -188,20 +193,35 @@ def evaluate_model(model_key: str, device: torch.device, max_samples_per_class: 
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Evaluate heritage classification models.")
+    parser.add_argument("--data-dir", type=str, default=None, help="Directory containing processed data")
+    parser.add_argument("--checkpoint-dir", type=str, default=None, help="Directory to load checkpoints from")
+    parser.add_argument("--results-dir", type=str, default=None, help="Directory to save evaluation results")
+    args = parser.parse_args()
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}\n")
+
+    results_dir_path = Path(args.results_dir) if args.results_dir else RESULTS_DIR
 
     all_results = []
     for model_key in MODEL_REGISTRY:
         print(f"\n{'='*50}")
         print(f"Evaluating: {model_key}")
         print(f"{'='*50}")
-        result = evaluate_model(model_key, device)
+        result = evaluate_model(
+            model_key,
+            device,
+            data_dir=args.data_dir,
+            checkpoint_dir=args.checkpoint_dir,
+            results_dir=args.results_dir
+        )
         if result:
             all_results.append(result)
 
     if all_results:
-        summary_path = RESULTS_DIR / "all_results_summary.json"
+        summary_path = results_dir_path / "all_results_summary.json"
         with open(summary_path, "w", encoding="utf-8") as f:
             json.dump(all_results, f, indent=2)
         print(f"\n\nAll results saved to {summary_path}")

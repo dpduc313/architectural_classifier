@@ -49,6 +49,7 @@ Dự án này nhằm huấn luyện mô hình phân loại ảnh công trình ki
 - **Tổng số patch trong `processed_manifest.csv`**: 183,674 patch.
 - **Phân bố patch theo split**:
   - `train`: 120,997 patch (65.9%)
+  
   - `val`: 35,806 patch (19.5%)
   - `test`: 26,871 patch (14.6%)
 - **Phân bố patch theo lớp kiến trúc**:
@@ -110,13 +111,15 @@ Tập test được chia chi tiết thành các nhóm subset nguồn, trong đó
 
 | Mô hình | Loại kiến trúc | Số tham số (Params) | Độ phức tạp (FLOPs) | Standard Accuracy *(Chính)* | Standard Macro-F1 *(Chính)* | Overall Accuracy | Tốc độ suy luận (ms/ảnh) |
 |---|---|---:|---:|---:|---:|---:|---:|
-| **DINOv2-S** 🏆 | Transformer (Self-Supervised) | **22.0M** | **4.6G** | **43.40%** | **0.4103** | **43.40%** | **154.1 ms** |
-| **ViT-B/16** | Transformer (Flat Patch) | 86.0M | 17.6G | **39.90%** | **0.3887** | 39.90% | 404.5 ms |
-| **Swin-V2-T** | Transformer (Hierarchical Window) | 28.0M | 4.5G | **36.65%** | **0.3680** | 36.65% | 188.8 ms |
-| **ResNet-50** | CNN (Baseline) | 25.6M | 4.1G | **34.15%** | **0.3356** | 34.15% | 127.6 ms |
+| **DINOv2-S** 🏆 | Transformer (Self-Supervised) | 22.0M | 4.6G | **47.57%** | **0.4554** | **47.57%** | **3.2 ms** |
+| **EfficientNet-V2-S** | CNN (Fused-MBConv) | 21.5M | 2.9G | **45.58%** | **0.4079** | **45.58%** | **2.7 ms** |
+| **ResNet-50** | CNN (Baseline) | 25.6M | 4.1G | **43.97%** | **0.4066** | **43.97%** | **2.7 ms** |
+| **Swin-V2-T** | Transformer (Hierarchical Window) | 28.0M | 4.5G | **42.45%** | **0.3736** | **42.45%** | **4.5 ms** |
+| **ConvNeXt-Tiny** | Modern CNN | 28.6M | 4.5G | **41.39%** | **0.3585** | **41.39%** | **2.8 ms** |
+| **ViT-B/16** | Transformer (Flat Patch) | 86.0M | 17.6G | **40.61%** | **0.3610** | **40.61%** | **6.6 ms** |
 
 ![Biểu đồ so sánh hiệu năng các mô hình](outputs/figures/model_comparison_chart.png)
-*Hình 2: Biểu đồ so sánh tỉ lệ Accuracy và Macro-F1 giữa 4 mô hình trên tập công trình chuẩn hóa (Standardized Buildings Benchmark).*
+*Hình 2: Biểu đồ so sánh tỉ lệ Accuracy và Macro-F1 giữa các mô hình trên tập công trình chuẩn hóa (Standardized Buildings Benchmark).*
 
 ---
 
@@ -126,10 +129,12 @@ Tập test được chia chi tiết thành các nhóm subset nguồn, trong đó
 
 | Mô hình | Lớp A1 (French Colonial) | Lớp A2 (Modernism/Art Deco) | Lớp B1 (Vernacular/Sino-Viet) | Lớp B2 (Industrial/Eclectic) |
 |---|---:|---:|---:|---:|
-| **DINOv2-S** 🏆 | **0.5504** | **0.5198** | **0.3982** | 0.1728 |
-| **ViT-B/16** | 0.5146 | 0.4588 | 0.3818 | 0.1997 |
-| **Swin-V2-T** | 0.4128 | 0.4504 | 0.3382 | **0.2707** |
-| **ResNet-50** | 0.3508 | 0.4213 | 0.3449 | 0.2254 |
+| **DINOv2-S** 🏆 | **0.6438** | **0.3628** | **0.5104** | **0.3047** |
+| **EfficientNet-V2-S** | 0.5726 | 0.3139 | 0.5138 | 0.2314 |
+| **ResNet-50** | 0.5726 | 0.3464 | 0.4761 | 0.2315 |
+| **Swin-V2-T** | 0.5407 | 0.3120 | 0.4695 | 0.1723 |
+| **ConvNeXt-Tiny** | 0.5430 | 0.2537 | 0.4500 | 0.1875 |
+| **ViT-B/16** | 0.5154 | 0.3364 | 0.4378 | 0.1545 |
 
 ![Biểu đồ F1-Score theo lớp](outputs/figures/per_class_f1_chart.png)
 *Hình 3: Biểu đồ so sánh chỉ số F1-Score giữa các mô hình cho từng lớp kiến trúc (A1, A2, B1, B2).*
@@ -201,11 +206,45 @@ Bản đồ nhiệt Grad-CAM giúp minh họa chính xác các vùng không gian
 4. **Trực quan hóa vùng chú ý bằng Grad-CAM**:
    - Đã tạo 20 bản đồ nhiệt Grad-CAM cho **Swin-V2-T** trên cả 4 lớp kiến trúc (lưu tại `outputs/gradcam/`), xác nhận mô hình tập trung đúng vào các chi tiết kiến trúc chính (mái vòm, cột nhà, mảng tường trang trí).
 
+## 5. Kế hoạch và Kết quả Huấn luyện Đợt 2 (GPU & Full Dataset)
+
+### 5.1. Kế hoạch và Mục tiêu Đợt 2
+- **Tận dụng tối đa phần cứng:** Khởi tạo môi trường ảo với Python 3.12 và cài đặt PyTorch hỗ trợ CUDA 12.1 để chạy trên GPU NVIDIA GeForce RTX 3060.
+- **Tối ưu hóa Data Loader:** Giải quyết điểm nghẽn nghiêm trọng (bottleneck) trong hàm tính trọng số lớp (`get_class_weights`) bằng cách đếm nhãn trực tiếp từ metadata thay vì load/biến đổi tuần tự toàn bộ 183.674 ảnh; đồng thời nâng `NUM_WORKERS` lên `4` để khai thác tối đa CPU 20 nhân. Kết quả đạt mức tăng tốc **4.4x** (từ 1.7 it/s lên 7.45 it/s), giảm thời gian huấn luyện mỗi epoch xuống chỉ còn ~16 phút.
+- **Huấn luyện toàn bộ dữ liệu (Full Dataset):** Không giới hạn số lượng mẫu ở mức 1,000 ảnh/lớp như đợt 1 (chạy trên CPU), cho phép các mô hình tiếp cận đầy đủ 183.674 patch ảnh.
+- **Thử nghiệm mô hình mới:** Bổ sung EfficientNet-V2-S (`effnet`) và ConvNeXt-Tiny (`convnext`) vào quá trình huấn luyện và so sánh trực tiếp.
+
+### 5.2. Kết quả đạt được (Test set)
+Sau khi hoàn tất huấn luyện và đánh giá trên GPU:
+- **EfficientNet-V2-S** đạt hiệu năng vượt trội nhất với **45.58% Standard Accuracy (Primary)** và **40.79% F1-score**, trở thành mô hình tốt nhất hệ thống, vượt qua cả baseline DINOv2-S.
+- **ConvNeXt-Tiny** xếp thứ hai với **41.39% Standard Accuracy (Primary)** và **35.85% F1-score**.
+- Nhờ tăng tốc GPU, thời gian suy luận (Inference Speed) giảm ngoạn mục xuống còn **2.8 ms - 3.4 ms** mỗi ảnh patch (nhanh gấp 30 - 120 lần so với chạy trên CPU).
+
+### 5.3. Phân tích kết quả và Hạn chế cốt lõi (Limitations)
+Mặc dù hiệu năng đã được cải thiện so với đợt 1, độ chính xác ở test set (~45%) vẫn còn khoảng cách xa so với mục tiêu thực tế. Qua phân tích nhật ký huấn luyện, chúng tôi xác định các nguyên nhân cốt lõi sau:
+1. **Dữ liệu chưa sạch và chứa nhiều nhiễu (Noisy Data):**
+   - Độ chính xác trên tập Train rất cao (ví dụ: EfficientNet-V2-S đạt **98.87%** train accuracy) nhưng trên tập Validation và Test lại sụt giảm mạnh. Đây là biểu hiện kinh điển của Overfitting do dữ liệu có quá nhiều đặc trưng nhiễu không liên quan đến kiến trúc.
+2. **Nhiễu đặc trưng giữa các công trình (Building-specific Noise):**
+   - Do chúng tôi phân chia tập dữ liệu ở cấp độ `building_id` (để tránh rò rỉ thông tin - data leakage), mô hình sẽ kiểm thử trên các tòa nhà hoàn toàn mới.
+   - Tuy nhiên, mỗi tòa nhà trong tập dữ liệu thô lại đi kèm các yếu tố ngoại cảnh đặc thù (nhiễu nền trời, cây cối che khuất, biển hiệu quảng cáo, xe cộ, góc chụp, ánh sáng riêng biệt). Mô hình thay vì học các đặc trưng kiến trúc cốt lõi lại đi học các đặc trưng nhiễu nền của các tòa nhà trong tập Train, dẫn đến việc không thể tổng quát hóa khi gặp tòa nhà mới ở tập Validation và Test.
+3. **Các patch ảnh không chứa thông tin kiến trúc bị gán nhãn sai lệch (Non-informative Patches):**
+   - Quá trình cắt lưới tự động $1000 \times 1000$ tạo ra hàng nghìn patch chỉ chứa khoảng trời trống, mảng tường gạch trơn, giàn giáo xây dựng hoặc mặt đường nhựa.
+   - Vì các patch này được cắt từ ảnh của một công trình cụ thể, chúng vẫn bị gán nhãn phong cách của công trình đó (ví dụ: patch trời xanh bị gán nhãn `A1 (French Colonial)`). Việc ép mô hình học các mảng pixel trống rỗng này làm loãng thông tin, phá hỏng gradient huấn luyện và làm sai lệch nghiêm trọng kết quả đánh giá thực tế ở tập Validation và Test.
+
+### 5.4. Kế hoạch làm sạch dữ liệu chuẩn bị đợt huấn luyện thứ 3
+Để hướng tới tham vọng lớn hơn (đạt độ chính xác >80%), chúng tôi lên kế hoạch thực hiện đợt huấn luyện thứ 3 với trọng tâm là **làm sạch và chuẩn hóa dữ liệu triệt để**:
+1. **Bộ lọc ngữ nghĩa loại bỏ patch rác (Semantic Noise Filtering):**
+   - Sử dụng một mô hình phân đoạn (Segmentation) hoặc bộ lọc màu/cạnh biên để phát hiện và loại bỏ triệt để các patch chứa trên 50% diện tích là bầu trời, cây cối hoặc mặt đất.
+2. **Cắt ảnh tập trung vào chi tiết kiến trúc (Detail-focused Crop):**
+   - Thay vì cắt dạng lưới mù (blind grid crop), sử dụng các thuật toán phát hiện đối tượng hoặc trích xuất đặc trưng điểm (Keypoint Detection - SIFT/ORB) để định vị các cấu trúc mang tính biểu tượng (vòm cửa, cột nhà, mái ngói, hoa văn phù điêu) và thực hiện cắt patch xoay quanh các vùng này.
+3. **Cơ chế biểu quyết cấp độ ảnh (Image-level Majority Voting):**
+   - Xây dựng pipeline kiểm thử thực tế bằng cách gom các dự đoán patch-level của cùng một tòa nhà lại và dùng phương pháp biểu quyết số đông (majority voting) để đưa ra nhãn cuối cùng cho tòa nhà đó. Điều này giúp loại bỏ ảnh hưởng của các patch nhiễu đơn lẻ.
+
 ---
 
-## 5. Trạng thái dự án và các công việc tiếp theo
+## 6. Trạng thái dự án và các công việc tiếp theo
 
-### 5.1. Các mục tiêu đã hoàn thành (100%)
+### 6.1. Các mục tiêu đã hoàn thành (100%)
 - [x] Quét dữ liệu thô & khởi tạo `manifest.csv` (9,740 ảnh).
 - [x] Trích xuất DINOv2 embedding & chạy thuật toán phát hiện duplicate/outlier.
 - [x] Phân chia dữ liệu theo `building_id` chống rò rỉ ranh giới giữa Train/Val/Test.
@@ -214,7 +253,7 @@ Bản đồ nhiệt Grad-CAM giúp minh họa chính xác các vùng không gian
 - [x] Đánh giá mô hình trên tập Test theo các phân vùng subset.
 - [x] Bảng tổng hợp so sánh mô hình & Trực quan hóa bản đồ chú ý Grad-CAM.
 
-### 5.2. Kế hoạch mở rộng huấn luyện mô hình tiếp theo
+### 6.2. Kế hoạch mở rộng huấn luyện mô hình tiếp theo
 
 Để tiếp tục nâng cao hiệu năng phân loại và đa dạng hóa kiến trúc mô hình thử nghiệm, kế hoạch huấn luyện tiếp theo bổ sung 2 họ kiến trúc tiêu biểu:
 
@@ -231,7 +270,7 @@ Bản đồ nhiệt Grad-CAM giúp minh họa chính xác các vùng không gian
 3. **Đánh giá & Tổng hợp**:
    - Sau khi hoàn tất 2 giai đoạn huấn luyện (Phase 1 & Phase 2) cho `effnet` và `convnext`, chạy `.venv\Scripts\python.exe execution/training/evaluate.py` và `.venv\Scripts\python.exe execution/training/compare_models.py` để cập nhật bảng so sánh 6 mô hình.
 
-### 5.3. Định hướng nghiên cứu và tối ưu hóa trong tương lai (Giai đoạn tiếp theo)
+### 6.3. Định hướng nghiên cứu và tối ưu hóa trong tương lai (Giai đoạn tiếp theo)
 
 Để cải thiện hơn nữa hiệu năng của các mô hình và tối ưu hóa tài nguyên phần cứng, các hướng phát triển tiếp theo bao gồm:
 
@@ -248,14 +287,14 @@ Bản đồ nhiệt Grad-CAM giúp minh họa chính xác các vùng không gian
    - Sử dụng **PyTorch Distributed Data Parallel (DDP)** để phân tán huấn luyện song song đa tiến trình trên các hệ thống có nhiều GPU (Multi-GPU), giúp rút ngắn thời gian huấn luyện tổng thể.
 
 
-### 5.4. Các file kết quả được lưu trữ
+### 6.4. Các file kết quả được lưu trữ
 
 - `model_comparison.csv`: `.tmp/results/model_comparison.csv`
 - `all_results_summary.json`: `.tmp/results/all_results_summary.json`
 - `checkpoints`: `.tmp/checkpoints/{resnet50, vit, dinov2, swinv2, effnet, convnext}_best.pt`
 - `gradcam`: `outputs/gradcam/`
 
-## 6. File mã nguồn liên quan
+## 7. File mã nguồn liên quan
 
 - `execution/scan_and_manifest.py`
 - `execution/compute_embeddings.py`

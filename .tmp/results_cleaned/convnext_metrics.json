@@ -1,0 +1,48 @@
+{
+  "model": "convnext",
+  "primary_standard": {
+    "num_images": 13559,
+    "accuracy": 0.4442,
+    "macro_f1": 0.3964,
+    "weighted_f1": 0.3922
+  },
+  "test_subsets": {
+    "Standard (Primary Focus)": {
+      "num_images": 13559,
+      "accuracy": 0.4442,
+      "macro_f1": 0.3964,
+      "weighted_f1": 0.3922
+    }
+  },
+  "test_accuracy": 0.4442,
+  "macro_f1": 0.3964,
+  "weighted_f1": 0.3922,
+  "ms_per_image": 4.35,
+  "num_test_images": 13559,
+  "per_class": {
+    "A1": {
+      "precision": 0.3888,
+      "recall": 0.8793,
+      "f1": 0.5392,
+      "support": 2975.0
+    },
+    "A2": {
+      "precision": 0.4359,
+      "recall": 0.336,
+      "f1": 0.3794,
+      "support": 1527.0
+    },
+    "B1": {
+      "precision": 0.4971,
+      "recall": 0.5161,
+      "f1": 0.5065,
+      "support": 4861.0
+    },
+    "B2": {
+      "precision": 0.6343,
+      "recall": 0.0918,
+      "f1": 0.1603,
+      "support": 4196.0
+    }
+  }
+}

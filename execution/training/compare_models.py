@@ -50,10 +50,19 @@ MODEL_TYPES = {
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Compare heritage classification models.")
+    parser.add_argument("--results-dir", type=str, default=None, help="Directory containing model metrics")
+    parser.add_argument("--log-dir", type=str, default=None, help="Directory containing training logs")
+    args = parser.parse_args()
+
+    results_dir_path = Path(args.results_dir) if args.results_dir else RESULTS_DIR
+    log_dir_path = Path(args.log_dir) if args.log_dir else (results_dir_path.parent / "logs_cleaned" if "cleaned" in str(results_dir_path) else results_dir_path.parent / "logs")
+
     rows = []
 
     for model_key, specs in MODEL_SPECS.items():
-        metrics_path = RESULTS_DIR / f"{model_key}_metrics.json"
+        metrics_path = results_dir_path / f"{model_key}_metrics.json"
 
         if not metrics_path.exists():
             print(f"[MISSING] {model_key}_metrics.json — run evaluate.py first.")
@@ -62,6 +71,7 @@ def main():
                 "Type":         MODEL_TYPES[model_key],
                 "Params (M)":   specs["params_M"],
                 "FLOPs (G)":    specs["flops_G"],
+                "Train Acc.":   "N/A",
                 "Test Acc.":    "N/A",
                 "Macro F1":     "N/A",
                 "Weighted F1":  "N/A",
@@ -76,11 +86,25 @@ def main():
             hist = subsets.get("Historic Old Pics", {"accuracy": 0.0, "macro_f1": 0.0})
             other = subsets.get("Other / Needs Edit", {"accuracy": 0.0, "macro_f1": 0.0})
 
+            # Read training accuracy from best validation epoch
+            train_acc = "N/A"
+            log_path = log_dir_path / f"{model_key}_train_log.csv"
+            if log_path.exists():
+                try:
+                    log_df = pd.read_csv(log_path)
+                    # Use the epoch with the highest validation accuracy
+                    if not log_df.empty:
+                        best_row = log_df.loc[log_df['val_acc'].idxmax()]
+                        train_acc = f"{best_row['train_acc']:.4f}"
+                except Exception as e:
+                    print(f"Error reading train log for {model_key}: {e}")
+
             row = {
                 "Model":           DISPLAY_NAMES[model_key],
                 "Type":            MODEL_TYPES[model_key],
                 "Params (M)":      specs["params_M"],
                 "FLOPs (G)":       specs["flops_G"],
+                "Train Acc (Best)": train_acc,
                 "Standard Acc (Primary)": f"{primary['accuracy']:.4f}",
                 "Standard F1 (Primary)":  f"{primary['macro_f1']:.4f}",
                 "Historic F1":     f"{hist['macro_f1']:.4f}",
@@ -105,7 +129,7 @@ def main():
     class_rows = []
     classes = ["A1", "A2", "B1", "B2"]
     for model_key in MODEL_SPECS:
-        metrics_path = RESULTS_DIR / f"{model_key}_metrics.json"
+        metrics_path = results_dir_path / f"{model_key}_metrics.json"
         if not metrics_path.exists():
             continue
         with open(metrics_path, "r", encoding="utf-8") as f:
@@ -120,8 +144,8 @@ def main():
         print(class_df.to_string(index=False))
 
     # ── Save CSV ───────────────────────────────────────────────────────────────
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = RESULTS_DIR / "model_comparison.csv"
+    results_dir_path.mkdir(parents=True, exist_ok=True)
+    out_path = results_dir_path / "model_comparison.csv"
     df.to_csv(out_path, index=False, encoding="utf-8-sig")
     print(f"\nComparison table saved to: {out_path}")
 

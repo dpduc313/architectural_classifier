@@ -1,0 +1,48 @@
+{
+  "model": "resnet50",
+  "primary_standard": {
+    "num_images": 13559,
+    "accuracy": 0.5172,
+    "macro_f1": 0.495,
+    "weighted_f1": 0.4983
+  },
+  "test_subsets": {
+    "Standard (Primary Focus)": {
+      "num_images": 13559,
+      "accuracy": 0.5172,
+      "macro_f1": 0.495,
+      "weighted_f1": 0.4983
+    }
+  },
+  "test_accuracy": 0.5172,
+  "macro_f1": 0.495,
+  "weighted_f1": 0.4983,
+  "ms_per_image": 4.28,
+  "num_test_images": 13559,
+  "per_class": {
+    "A1": {
+      "precision": 0.5012,
+      "recall": 0.7933,
+      "f1": 0.6143,
+      "support": 2975.0
+    },
+    "A2": {
+      "precision": 0.4144,
+      "recall": 0.4754,
+      "f1": 0.4428,
+      "support": 1527.0
+    },
+    "B1": {
+      "precision": 0.5641,
+      "recall": 0.5818,
+      "f1": 0.5728,
+      "support": 4861.0
+    },
+    "B2": {
+      "precision": 0.5271,
+      "recall": 0.2619,
+      "f1": 0.3499,
+      "support": 4196.0
+    }
+  }
+}

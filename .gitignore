@@ -7,6 +7,10 @@ ENV/
 # Data directories (large folders)
 raw_data/
 processed_data/
+processed_data_cleaned/
+
+# Review HTML files
+review_*.html
 
 # Temporary directories and caches
 .tmp/**/*

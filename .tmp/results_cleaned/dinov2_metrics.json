@@ -1,0 +1,48 @@
+{
+  "model": "dinov2",
+  "primary_standard": {
+    "num_images": 13559,
+    "accuracy": 0.522,
+    "macro_f1": 0.498,
+    "weighted_f1": 0.5009
+  },
+  "test_subsets": {
+    "Standard (Primary Focus)": {
+      "num_images": 13559,
+      "accuracy": 0.522,
+      "macro_f1": 0.498,
+      "weighted_f1": 0.5009
+    }
+  },
+  "test_accuracy": 0.522,
+  "macro_f1": 0.498,
+  "weighted_f1": 0.5009,
+  "ms_per_image": 4.2,
+  "num_test_images": 13559,
+  "per_class": {
+    "A1": {
+      "precision": 0.6135,
+      "recall": 0.7939,
+      "f1": 0.6922,
+      "support": 2975.0
+    },
+    "A2": {
+      "precision": 0.3262,
+      "recall": 0.5776,
+      "f1": 0.4169,
+      "support": 1527.0
+    },
+    "B1": {
+      "precision": 0.5722,
+      "recall": 0.605,
+      "f1": 0.5881,
+      "support": 4861.0
+    },
+    "B2": {
+      "precision": 0.4788,
+      "recall": 0.2128,
+      "f1": 0.2947,
+      "support": 4196.0
+    }
+  }
+}
