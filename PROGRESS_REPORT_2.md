@@ -84,6 +84,6 @@ Dựa trên các kết quả và phân tích ở Đợt 2, chúng tôi đề xu�
 
 4. **Tiêu chí Lọc Dữ liệu Đợt Cuối (Manual Curation Criteria):**
    * **Tiêu chí 1 (Thông tin kiến trúc):** Phần lớn diện tích của patch phải chứa thông tin kiến trúc rõ ràng (tường, ngói, hoa văn, màu sơn, chất liệu phải hiển thị rõ ràng và có thể mang một phong cách nhất định).
-   * **Tiêu chí 2 (Hạn chế nhiễu - Noise Control):** Không chứa quá nhiều nhiễu làm ảnh hưởng đến nhận diện (nhiễu bao gồm: một phần kiến trúc của tòa nhà/công trình khác, thùng rác, xe cộ, người, cây lá không thuộc công trình kiến trúc hoặc không giúp định nghĩa phong cách/style).
+   * **Tiêu chí 2 (Hạn chế nhiễu - Noise Control):** Không chứa quá nhiều nhiễu làm ảnh hưởng đến nhận diện (nhiễu bao gồm: một phần kiến trúc của tòa nhà/công trình khác, thùng rác, xe cộ, người, cây lá, dây điện, cột điện, mặt đường, bầu trời không thuộc công trình kiến trúc hoặc không chứa thông tin kiến trúc hữu ích và không giúp định nghĩa phong cách/style).
    * **Tiêu chí 3 (Chất lượng ảnh):** Loại bỏ các ảnh gặp lỗi chất lượng như quá sáng, quá tối, hoặc quá mờ.
 
