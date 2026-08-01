@@ -89,57 +89,43 @@ class HeritageDataset(Dataset):
 
     def __init__(self, processed_dir: str, split: str,
                  input_size: int = 224, norm_mean=None, norm_std=None,
-                 max_samples_per_class: int = None):
+                 max_samples_per_class: int = None, manifest_path: str = None):
         self.transform = get_transforms(split, input_size, norm_mean, norm_std)
-        self.samples: list[tuple[Path, int]] = []
+        self.samples: list[tuple[Path, int, int]] = []
 
-        split_dir = Path(processed_dir) / split
-        if not split_dir.exists():
-            raise FileNotFoundError(
-                f"Split directory not found: {split_dir}\n"
-                "Make sure preprocess_images.py has been run first."
-            )
+        if manifest_path is None:
+            if split == "reference_test":
+                manifest_path = Path(processed_dir).parent / ".tmp" / "final_reference_test_manifest.csv"
+            else:
+                manifest_path = Path(processed_dir).parent / ".tmp" / f"final_{split}_manifest.csv"
 
-        for class_name in CLASSES:
-            class_dir = split_dir / class_name
-            if not class_dir.exists():
-                continue
-            seen = set()
-            imgs = []
-            for ext in ["*.jpg", "*.jpeg", "*.png", "*.JPG", "*.JPEG", "*.PNG"]:
-                for img_path in class_dir.glob(ext):
-                    canonical_name = img_path.name.lower()
-                    if canonical_name not in seen:
-                        seen.add(canonical_name)
-                        imgs.append(img_path)
-            imgs = sorted(imgs)
-            if max_samples_per_class is not None and len(imgs) > max_samples_per_class:
-                # Subsample deterministically with fixed step stride for even coverage across buildings
-                step = len(imgs) / max_samples_per_class
-                indices = [int(i * step) for i in range(max_samples_per_class)]
-                imgs = [imgs[i] for i in indices]
-            for img_path in imgs:
-                self.samples.append((img_path, CLASS_TO_IDX[class_name]))
+        manifest_path = Path(manifest_path)
+        if not manifest_path.exists():
+            raise FileNotFoundError(f"Manifest file not found: {manifest_path}")
+
+        df = pd.read_csv(manifest_path)
+        for _, row in df.iterrows():
+            img_path = Path(row['processed_path'])
+            style_idx = CLASS_TO_IDX[row['style_label']]
+            arch_sublabel = int(row.get('architectural_sublabel', 1))
+            self.samples.append((img_path, style_idx, arch_sublabel))
 
         if len(self.samples) == 0:
-            raise ValueError(f"No images found in {split_dir}. "
-                             "Check that preprocess_images.py completed successfully.")
+            raise ValueError(f"No samples found in {manifest_path}.")
 
-        print(f"[HeritageDataset] {split}: {len(self.samples)} patches across "
-              f"{len(CLASSES)} classes.")
+        print(f"[HeritageDataset] {split}: {len(self.samples)} patches across {len(CLASSES)} classes.")
 
     def __len__(self) -> int:
         return len(self.samples)
 
     def __getitem__(self, idx: int):
-        img_path, label = self.samples[idx]
+        img_path, style_label, arch_sublabel = self.samples[idx]
         try:
             image = Image.open(img_path).convert("RGB")
         except Exception as e:
-            print(f"Warning: could not open {img_path}: {e}. Returning zeros.")
             image = Image.new("RGB", (224, 224), color=0)
         image = self.transform(image)
-        return image, label, str(img_path)
+        return image, style_label, arch_sublabel, str(img_path)
 
 
 def get_class_weights(dataset: HeritageDataset) -> torch.Tensor:

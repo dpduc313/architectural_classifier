@@ -43,9 +43,9 @@ LOG_DIR        = PROJECT_ROOT / ".tmp" / "logs"
 
 # ── Model registry (timm IDs) ──────────────────────────────────────────────────
 MODEL_REGISTRY = {
-    "swinv2":   "swinv2_tiny_window8_256.ms_in1k",
+    "swinv2":   "swin_base_patch4_window12_384.ms_in22k",
     "vit":      "vit_base_patch16_224.augreg2_in21k_ft_in1k",
-    "dinov2":   "vit_small_patch14_dinov2.lvd142m",
+    "dinov2":   "vit_base_patch14_dinov2.lvd142m",
     "resnet50": "resnet50.a1_in1k",
     "effnet":   "tf_efficientnetv2_s.in21k_ft_in1k",
     "convnext": "convnext_tiny.fb_in22k_ft_in1k",
@@ -138,7 +138,7 @@ def run_epoch(model, loader, criterion, optimizer, device, scaler, is_train: boo
 
     ctx = torch.enable_grad() if is_train else torch.no_grad()
     with ctx:
-        for images, labels, _ in tqdm(loader, leave=False):
+        for images, labels, arch_labels, _ in tqdm(loader, leave=False):
             images, labels = images.to(device), labels.to(device)
 
             if is_train:

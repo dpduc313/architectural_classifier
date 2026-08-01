@@ -73,43 +73,66 @@ def evaluate_model(model_key: str, device: torch.device, max_samples_per_class: 
     test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False,
                              num_workers=NUM_WORKERS)
 
+    ref_ds = HeritageDataset(data_dir_path, "reference_test", input_size, norm_mean, norm_std,
+                            max_samples_per_class=max_samples_per_class)
+    ref_loader = DataLoader(ref_ds, batch_size=batch_size, shuffle=False,
+                            num_workers=NUM_WORKERS)
+
     model = load_model(model_key, checkpoint_path, device)
 
-    all_preds, all_labels, all_paths = [], [], []
-    all_probs = []
+    def run_eval(loader):
+        all_preds, all_labels, all_paths = [], [], []
+        all_arch_preds, all_arch_labels = [], []
+        all_probs = []
 
-    t0 = time.time()
-    with torch.no_grad():
-        for images, labels, paths in test_loader:
-            images = images.to(device)
-            logits = model(images)
-            probs  = torch.softmax(logits, dim=1).cpu()
-            preds  = logits.argmax(dim=1).cpu()
-            all_preds.extend(preds.tolist())
-            all_labels.extend(labels.tolist())
-            all_paths.extend(paths)
-            all_probs.extend(probs.tolist())
-    inference_time = time.time() - t0
-    ms_per_image = (inference_time / len(test_ds)) * 1000
+        t0 = time.time()
+        with torch.no_grad():
+            for images, labels, arch_labels, paths in loader:
+                images = images.to(device)
+                logits = model(images)
+                probs  = torch.softmax(logits, dim=1).cpu()
+                preds  = logits.argmax(dim=1).cpu()
 
-    # ── Categorize test samples into 3 subsets ──────────────────────────────────
-    # 1. Standardized Buildings (Primary Focus)
-    # 2. Historic Vietnam Old Pics
-    # 3. Other Modernism / Needs Edit (cần chỉnh sửa)
-    subset_indices = {
-        "Standard (Primary Focus)": [],
-        "Historic Old Pics": [],
-        "Other / Needs Edit": [],
-    }
+                all_preds.extend(preds.tolist())
+                all_labels.extend(labels.tolist())
+                all_arch_labels.extend(arch_labels.tolist())
+                all_paths.extend(paths)
+                all_probs.extend(probs.tolist())
+        inference_time = time.time() - t0
+        return all_preds, all_labels, all_arch_labels, all_paths, all_probs, inference_time
 
-    for idx, path in enumerate(all_paths):
-        path_str = str(path)
-        if "HistoricVietnam-OldPics" in path_str:
-            subset_indices["Historic Old Pics"].append(idx)
-        elif "Other-Modernism" in path_str or "need_review" in path_str or "cần chỉnh sửa" in path_str:
-            subset_indices["Other / Needs Edit"].append(idx)
-        else:
-            subset_indices["Standard (Primary Focus)"].append(idx)
+    all_preds, all_labels, all_arch_labels, all_paths, all_probs, inference_time = run_eval(test_loader)
+    ms_per_image = (inference_time / max(1, len(test_ds))) * 1000
+
+    # ── Original Image Level Majority Voting ─────────────────────────────────────
+    # Group patches by parent original image stem
+    image_groups = {}
+    for p, lbl, pred, arch_lbl in zip(all_paths, all_labels, all_preds, all_arch_labels):
+        # Extract base image name (e.g. A1.30.Pol-Mas_01 from A1.30.Pol-Mas_01_patch_1_2.jpg)
+        p_name = Path(p).name
+        base_img = p_name.rsplit("_patch_", 1)[0] if "_patch_" in p_name else p_name
+        
+        if base_img not in image_groups:
+            image_groups[base_img] = {"true_label": lbl, "patch_preds": [], "patch_arch": []}
+        
+        image_groups[base_img]["patch_preds"].append(pred)
+        image_groups[base_img]["patch_arch"].append(arch_lbl)
+
+    img_true_labels, img_pred_labels = [], []
+    for b_img, data in image_groups.items():
+        # Keep only patches labeled/predicted as Architectural (1)
+        valid_preds = [p for p, a in zip(data["patch_preds"], data["patch_arch"]) if a == 1]
+        if len(valid_preds) == 0:
+            # Fallback to all patch predictions if no architectural patch found
+            valid_preds = data["patch_preds"]
+        
+        # Majority vote
+        vote = max(set(valid_preds), key=valid_preds.count)
+        img_true_labels.append(data["true_label"])
+        img_pred_labels.append(vote)
+
+    image_level_acc = accuracy_score(img_true_labels, img_pred_labels) if img_true_labels else 0.0
+    image_level_macro_f1 = f1_score(img_true_labels, img_pred_labels, average="macro", zero_division=0) if img_true_labels else 0.0
 
     subset_results = {}
     for sub_name, indices in subset_indices.items():
