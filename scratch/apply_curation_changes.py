@@ -67,6 +67,43 @@ def main():
     df_curated.to_csv(MANIFEST_CURATED_PATH, index=False)
     print(f"Curated manifest saved successfully to: {MANIFEST_CURATED_PATH} ({len(df_curated):,} patches)")
 
+    # Update the review tracker based on what was submitted
+    import json
+    tracker_path = PROJECT_ROOT / ".tmp" / "reviewed_paths_tracker.json"
+    under_review_path = PROJECT_ROOT / ".tmp" / "current_under_review.json"
+    
+    if tracker_path.exists() and under_review_path.exists():
+        try:
+            with open(tracker_path, "r", encoding="utf-8") as f:
+                tracker = json.load(f)
+            with open(under_review_path, "r", encoding="utf-8") as f:
+                under_review = json.load(f)
+                
+            tracker_updated = False
+            
+            # If addition files are present, it means the Filtered pool HTML has been reviewed
+            if len(move_to_kept_files) > 0 and len(under_review.get("filtered", [])) > 0:
+                print(f"Adding {len(under_review['filtered'])} Filtered paths to reviewed tracker...")
+                tracker["filtered"].extend([item["processed_path"] for item in under_review["filtered"]])
+                under_review["filtered"] = []
+                tracker_updated = True
+                
+            # If removal files are present, it means the Kept pool HTML has been reviewed
+            if len(filter_out_files) > 0 and len(under_review.get("kept", [])) > 0:
+                print(f"Adding {len(under_review['kept'])} Kept paths to reviewed tracker...")
+                tracker["kept"].extend([item["processed_path"] for item in under_review["kept"]])
+                under_review["kept"] = []
+                tracker_updated = True
+                
+            if tracker_updated:
+                with open(tracker_path, "w", encoding="utf-8") as f:
+                    json.dump(tracker, f, indent=2)
+                with open(under_review_path, "w", encoding="utf-8") as f:
+                    json.dump(under_review, f, indent=2)
+                print("Tracker and under_review state updated successfully.")
+        except Exception as e:
+            print(f"Error updating tracker/under_review states: {e}")
+
     # 3. Archive the CSV files instead of deleting them
     import datetime
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")

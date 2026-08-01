@@ -62,31 +62,62 @@ def main():
         except Exception as e:
             print(f"Error initializing tracker: {e}")
 
+    # Load or initialize current_under_review
+    under_review_path = PROJECT_ROOT / ".tmp" / "current_under_review.json"
+    under_review = {"kept": [], "filtered": []}
+    if under_review_path.exists():
+        try:
+            with open(under_review_path, "r", encoding="utf-8") as f:
+                under_review = json.load(f)
+        except Exception as e:
+            print(f"Error loading under_review: {e}")
+
+    # Extract paths currently in under_review to avoid duplicating them
+    under_review_kept_paths = [item['processed_path'] for item in under_review.get('kept', [])]
+    under_review_filtered_paths = [item['processed_path'] for item in under_review.get('filtered', [])]
+
     # Filter out already reviewed paths
-    kept_pool = kept_df[~kept_df['processed_path'].isin(tracker['kept'])]
-    filtered_pool = filtered_df[~filtered_df['processed_path'].isin(tracker['filtered'])]
+    kept_pool = kept_df[
+        ~kept_df['processed_path'].isin(tracker['kept']) & 
+        ~kept_df['processed_path'].isin(under_review_kept_paths)
+    ]
+    filtered_pool = filtered_df[
+        ~filtered_df['processed_path'].isin(tracker['filtered']) & 
+        ~filtered_df['processed_path'].isin(under_review_filtered_paths)
+    ]
 
     print(f"Available pools for next batch — Kept: {len(kept_pool):,} | Filtered: {len(filtered_pool):,}")
 
     sample_size = 2000
     
-    # Sample from the remaining pools
-    sampled_kept = kept_pool.sample(n=min(sample_size, len(kept_pool)), random_state=random.randint(1, 100000)).to_dict('records')
-    sampled_filtered = filtered_pool.sample(n=min(sample_size, len(filtered_pool)), random_state=random.randint(1, 100000)).to_dict('records')
+    # Process Kept pool (to generate review_kept_patches.html)
+    if under_review.get('kept'):
+        print("Reusing existing Kept patches currently under review.")
+        sampled_kept = under_review['kept']
+    else:
+        print("Sampling new Kept patches for review.")
+        sampled_kept = kept_pool.sample(n=min(sample_size, len(kept_pool)), random_state=random.randint(1, 100000)).to_dict('records')
+        under_review['kept'] = sampled_kept
+
+    # Process Filtered pool (to generate review_filtered_patches.html)
+    if under_review.get('filtered'):
+        print("Reusing existing Filtered patches currently under review.")
+        sampled_filtered = under_review['filtered']
+    else:
+        print("Sampling new Filtered patches for review.")
+        sampled_filtered = filtered_pool.sample(n=min(sample_size, len(filtered_pool)), random_state=random.randint(1, 100000)).to_dict('records')
+        under_review['filtered'] = sampled_filtered
+
+    # Save under_review state
+    try:
+        with open(under_review_path, "w", encoding="utf-8") as f:
+            json.dump(under_review, f, indent=2)
+    except Exception as e:
+        print(f"Error saving under_review: {e}")
 
     # Print cumulative progress stats
     total_reviewed = len(tracker['kept']) + len(tracker['filtered'])
     print(f"PROGRESS UPDATE: You have manually reviewed {len(tracker['kept']):,} kept and {len(tracker['filtered']):,} filtered patches. Total Reviewed: {total_reviewed:,} patches.")
-
-    # Update tracker
-    tracker['kept'].extend([item['processed_path'] for item in sampled_kept])
-    tracker['filtered'].extend([item['processed_path'] for item in sampled_filtered])
-    
-    try:
-        with open(tracker_path, "w", encoding="utf-8") as f:
-            json.dump(tracker, f, indent=2)
-    except Exception as e:
-        print(f"Error saving tracker: {e}")
 
     # Convert items to serializable list for JS
     kept_items = []
