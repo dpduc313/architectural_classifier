@@ -20,7 +20,14 @@ def main():
         return
 
     # Load manifest
-    print("Loading original clean manifest...")
+    if MANIFEST_CURATED_PATH.exists():
+        print("Loading existing curated manifest...")
+        df_base = pd.read_csv(MANIFEST_CURATED_PATH)
+    else:
+        print("Loading original clean manifest...")
+        df_base = pd.read_csv(MANIFEST_CLEANED_PATH)
+    base_subpaths = set(df_base['processed_path'].apply(get_subpath).tolist())
+
     df_cleaned = pd.read_csv(MANIFEST_CLEANED_PATH)
     cleaned_subpaths = set(df_cleaned['processed_path'].apply(get_subpath).tolist())
 
@@ -54,7 +61,7 @@ def main():
             print(f"Error reading {f_name}: {e}")
 
     # Apply changes
-    final_subpaths = (cleaned_subpaths - removed_subpaths) | added_subpaths
+    final_subpaths = (base_subpaths - removed_subpaths) | added_subpaths
 
     # Reconstruct curated manifest
     print("Reconstructing final curated manifest...")
@@ -126,7 +133,9 @@ def main():
             print(f"  Error archiving {f_name}: {e}")
 
     # Create the REVIEW_PLAN.md file
-    generate_review_plan(len(df_cleaned), len(added_subpaths), len(removed_subpaths), len(df_curated))
+    cumulative_added = len(final_subpaths - cleaned_subpaths)
+    cumulative_removed = len(cleaned_subpaths - final_subpaths)
+    generate_review_plan(len(df_cleaned), cumulative_added, cumulative_removed, len(df_curated))
 
 def generate_review_plan(original_count, added, removed, curated):
     plan_path = PROJECT_ROOT / "REVIEW_PLAN.md"
