@@ -5,9 +5,9 @@
 * **Tiến độ Curation (Lọc Thủ công):** Bạn đã hoàn thành xuất sắc **12 đợt lọc** với tổng cộng **24,000 patches** được đánh giá thủ công (12,000 ở nhánh Lọc rác và 12,000 ở nhánh Giữ ảnh).
 * **Kết quả Curated Manifest hiện tại:**
   * Kích thước ban đầu (YOLOv8 >= 1.8%): `85,991` patches
-  * Số patch được bạn thêm lại (YOLO lọc nhầm): `+39,534` patches
-  * Số patch được bạn xóa bỏ (vẫn còn nhiễu rác): `-16,704` patches
-  * Quy mô dữ liệu hiện tại sau curation: **`108,821`** patches
+  * Số patch được bạn thêm lại (YOLO lọc nhầm): `+40,937` patches
+  * Số patch được bạn xóa bỏ (vẫn còn nhiễu rác): `-17,048` patches
+  * Quy mô dữ liệu hiện tại sau curation: **`109,880`** patches
 
 ---
 
