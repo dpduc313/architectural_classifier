@@ -16,8 +16,8 @@
 ### A. Nhiệm vụ và Tác vụ
 1. **Tiếp tục Đợt 13 (2,000 ảnh/tập):**
    * Các file HTML đã được tự động làm mới với **2,000 ảnh tiếp theo** không trùng lặp.
-   * Review các patch được lọc bỏ tại: [review_filtered_patches.html](file:///c:/Users/Admin/Desktop/architect/review_filtered_patches.html) (chọn ảnh để **KEEP**).
-   * Review các patch được giữ lại tại: [review_kept_patches.html](file:///c:/Users/Admin/Desktop/architect/review_kept_patches.html) (chọn ảnh để **FILTER OUT**).
+   * Review các patch được lọc bỏ tại: [review_filtered_patches.html](file:///C:/Users/teflo/Desktop/Study/VLU/Comp vision/BT/Final/review_filtered_patches.html) (chọn ảnh để **KEEP**).
+   * Review các patch được giữ lại tại: [review_kept_patches.html](file:///C:/Users/teflo/Desktop/Study/VLU/Comp vision/BT/Final/review_kept_patches.html) (chọn ảnh để **FILTER OUT**).
 2. **Xuất CSV & Chạy script:**
    * Sau khi hoàn thành đợt review mới, xuất các tệp CSV như thường lệ.
    * Chạy lệnh sau để cập nhật Manifest Curated và làm mới đợt tiếp theo:

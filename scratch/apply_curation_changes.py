@@ -139,6 +139,11 @@ def main():
 
 def generate_review_plan(original_count, added, removed, curated):
     plan_path = PROJECT_ROOT / "REVIEW_PLAN.md"
+    filtered_path_str = str(PROJECT_ROOT / "review_filtered_patches.html").replace('\\', '/')
+    kept_path_str = str(PROJECT_ROOT / "review_kept_patches.html").replace('\\', '/')
+    filtered_html_url = f"file:///{filtered_path_str}"
+    kept_html_url = f"file:///{kept_path_str}"
+    
     content = f"""# Kế hoạch Đánh giá Thủ công (Manual Review Plan)
 
 ## 1. Tóm tắt Tiến độ Huấn luyện & Curation
@@ -157,8 +162,8 @@ def generate_review_plan(original_count, added, removed, curated):
 ### A. Nhiệm vụ và Tác vụ
 1. **Tiếp tục Đợt 13 (2,000 ảnh/tập):**
    * Các file HTML đã được tự động làm mới với **2,000 ảnh tiếp theo** không trùng lặp.
-   * Review các patch được lọc bỏ tại: [review_filtered_patches.html](file:///c:/Users/Admin/Desktop/architect/review_filtered_patches.html) (chọn ảnh để **KEEP**).
-   * Review các patch được giữ lại tại: [review_kept_patches.html](file:///c:/Users/Admin/Desktop/architect/review_kept_patches.html) (chọn ảnh để **FILTER OUT**).
+   * Review các patch được lọc bỏ tại: [review_filtered_patches.html]({filtered_html_url}) (chọn ảnh để **KEEP**).
+   * Review các patch được giữ lại tại: [review_kept_patches.html]({kept_html_url}) (chọn ảnh để **FILTER OUT**).
 2. **Xuất CSV & Chạy script:**
    * Sau khi hoàn thành đợt review mới, xuất các tệp CSV như thường lệ.
    * Chạy lệnh sau để cập nhật Manifest Curated và làm mới đợt tiếp theo:

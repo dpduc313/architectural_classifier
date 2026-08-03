@@ -32,8 +32,14 @@ def main():
     df_all['is_kept'] = df_all['processed_path'].apply(get_subpath).isin(kept_subpaths)
     
     kept_df = df_all[df_all['is_kept']].copy()
-    kept_df['img_url'] = kept_df['processed_path'].apply(lambda x: x.replace('processed_data', 'processed_data_cleaned'))
     
+    cleaned_dir = PROJECT_ROOT / "processed_data_cleaned"
+    if cleaned_dir.exists():
+        kept_df['img_url'] = kept_df['processed_path'].apply(lambda x: x.replace('processed_data', 'processed_data_cleaned'))
+    else:
+        print("[FALLBACK] processed_data_cleaned directory not found. Using processed_data paths for Kept review images to save disk space.")
+        kept_df['img_url'] = kept_df['processed_path']
+        
     filtered_df = df_all[~df_all['is_kept']].copy()
     filtered_df['img_url'] = filtered_df['processed_path']
     
@@ -120,11 +126,16 @@ def main():
     print(f"PROGRESS UPDATE: You have manually reviewed {len(tracker['kept']):,} kept and {len(tracker['filtered']):,} filtered patches. Total Reviewed: {total_reviewed:,} patches.")
 
     # Convert items to serializable list for JS
+    use_cleaned = cleaned_dir.exists()
+    
     kept_items = []
     for item in sampled_kept:
+        url = item['img_url'].replace('\\', '/')
+        if not use_cleaned:
+            url = url.replace('processed_data_cleaned', 'processed_data')
         kept_items.append({
             "path": item['processed_path'],
-            "url": item['img_url'].replace('\\', '/'),
+            "url": url,
             "style": item['style_label'],
             "split": item['split'],
             "building": item['building_id']
@@ -132,9 +143,12 @@ def main():
 
     filtered_items = []
     for item in sampled_filtered:
+        url = item['img_url'].replace('\\', '/')
+        if not use_cleaned:
+            url = url.replace('processed_data_cleaned', 'processed_data')
         filtered_items.append({
             "path": item['processed_path'],
-            "url": item['img_url'].replace('\\', '/'),
+            "url": url,
             "style": item['style_label'],
             "split": item['split'],
             "building": item['building_id']

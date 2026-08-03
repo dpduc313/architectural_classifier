@@ -60,7 +60,7 @@ Quá trình tinh chỉnh dữ liệu trải qua 40 đợt review liên tục v�
 
 ## 2. PHÂN CHIA DỮ LIỆU & CÔ LẬP TẬP TEST THAM KHẢO
 
-Để đảm bảo mô hình không bị lệch do nhãn rác từ các thư mục chưa chuẩn hóa, hệ thống sử dụng module [execution/prepare_final_manifest.py](file:///c:/Users/Admin/Desktop/architect/execution/prepare_final_manifest.py) phân chia dữ liệu theo ID tòa nhà:
+Để đảm bảo mô hình không bị lệch do nhãn rác từ các thư mục chưa chuẩn hóa, hệ thống sử dụng module [execution/prepare_final_manifest.py](file:///c:/Users/teflo/Desktop/Study/VLU/Comp%20vision/BT/Final/execution/prepare_final_manifest.py) phân chia dữ liệu theo ID tòa nhà:
 
 ```mermaid
 flowchart TD
