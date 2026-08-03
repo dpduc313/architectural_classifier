@@ -66,9 +66,15 @@ Bộ dữ liệu gốc ban đầu được cung cấp bao gồm **137 công trì
   - **Kết quả Chuyển đổi:** Biến bộ dữ liệu ảnh gốc ban đầu (~10,000 ảnh) thành bộ dữ liệu khổng lồ **183,674 patches**, ép các mô hình tập trung trích xuất sâu các chi tiết kiến trúc vi mô (mái ngói âm dương, bờ gờ uốn cong, phào chỉ, hoa văn vòm cửa, mảng kính) thay vì thông tin nền không liên quan.
 
 - **Quá trình Lọc 183,674 Patches qua 2 Phương pháp & Tác động đến Kết quả Huấn luyện (Tham chiếu Chương 3 & Chương 5):**
-  1. *Phương pháp 1: Lọc Tự động bằng YOLOv8 ($\ge 1.8\%$ Bounding Box Area):*
-     - YOLOv8 tự động phát hiện đối tượng và chỉ giữ lại **85,991 patches** có diện tích bounding box $\ge 1.8\%$, đẩy 97,683 patches còn lại vào danh sách loại bỏ.
-     - *Hạn chế:* YOLOv8 lọc quá cứng nhắc dựa trên nhận diện đối tượng chung, dẫn đến việc **bỏ sót hàng chục nghìn patch chứa chi tiết hoa văn kiến trúc quý giá** nhưng diện tích nhỏ, làm giảm đáng kể tính đa dạng của tập huấn luyện.
+  1. *Phương pháp 1: Lọc Tự động bằng YOLOv8 (Kiến trúc Phân đoạn Tòa nhà):*
+     - **Mô hình & Tham số:** Sử dụng mô hình YOLOv8m tiền huấn luyện phân đoạn tòa nhà (`keremberke/yolov8m-building-segmentation` trên Hugging Face), chạy suy luận với ngưỡng tin cậy `conf = 0.25`.
+     - **Logic Tính toán:** Đối với mỗi patch $1000 \times 1000$, mô hình trích xuất các mặt nạ phân đoạn (segmentation masks). Hệ thống gộp các mặt nạ dự đoán thành một mặt nạ nhị phân duy nhất $M$:
+       $$M = \bigvee_{i=1}^{K} (Mask_i > 0.5)$$
+       Tỷ lệ diện tích tòa nhà (Building Ratio) được tính bằng trung bình số pixel của mặt nạ gộp trên tổng số pixel của patch:
+       $$\text{Building Ratio} = \frac{1}{H \times W} \sum_{y=1}^{H} \sum_{x=1}^{W} M(y, x)$$
+       Patch được giữ lại nếu tỷ lệ diện tích tòa nhà đạt tối thiểu 1.8% (`building_ratio >= 0.018`).
+     - **Kết quả Lọc lần đầu:** Giữ lại **85,991 patches** và loại bỏ **97,683 patches** vào pool rác.
+     - **Hạn chế:** YOLOv8 chỉ học nhận diện hình dáng tổng thể của cả tòa nhà (cửa ra vào, tường ngoài, mái lớn). Do đó, mô hình này bị mù màu đối với các **chi tiết kiến trúc vi mô** (hoa văn điêu khắc Pháp cổ, bờ đao, phào chỉ nhỏ, hoa văn cổng sắt di sản) nằm trong các patch chụp cận cảnh, dẫn tới việc loại bỏ sai hàng chục nghìn mẫu vật có giá trị học sâu cao.
   2. *Phương pháp 2: Quy trình Kiểm duyệt Thủ công 100% (100% Full Manual Human Curation Protocol):*
      - Nhóm nghiên cứu thực hiện review thủ công 100% toàn bộ **183,674 patches** ở cả 2 danh mục, phân loại nhãn phụ nhị phân `architectural` ($1$) vs `non-architectural` ($0$).
      - *Kết quả đột phá:* **Cứu lại được 32,479 patches kiến trúc quý giá** bị YOLOv8 đánh giá nhầm là rác, nâng tổng số patch kiến trúc chuẩn lên **118,470 patches (64.5%)**, đồng thời cô lập triệt để 65,204 patches nhiễu (bầu trời, dây điện, cột điện).
