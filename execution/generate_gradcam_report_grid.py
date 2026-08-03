@@ -6,7 +6,6 @@ Each pair panel shows the original image on the left and the Grad-CAM + caption 
 
 import os
 import sys
-import textwrap
 from pathlib import Path
 import cv2
 import numpy as np
@@ -49,41 +48,40 @@ def generate_heatmap(image_np, cam_map):
 
 
 def render_pair_panel(original_np, overlay_np, title_lines, output_path, accent_color):
-    """Render a single panel with original image on the left and Grad-CAM + caption on the right."""
-    fig = plt.figure(figsize=(9.4, 4.8), facecolor="white")
-    grid = fig.add_gridspec(
-        2,
-        2,
-        width_ratios=[1.0, 1.08],
-        height_ratios=[0.28, 0.72],
-        wspace=0.02,
-        hspace=0.04,
-    )
+    """Render a single 1x2 panel with labels embedded on both images."""
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.8), facecolor="white")
+    left_ax, right_ax = axes
 
-    ax_original = fig.add_subplot(grid[:, 0])
-    ax_caption = fig.add_subplot(grid[0, 1])
-    ax_overlay = fig.add_subplot(grid[1, 1])
-
-    ax_original.imshow(original_np)
-    ax_original.axis("off")
-
-    ax_caption.axis("off")
-    caption_text = "\n".join(title_lines)
-    ax_caption.text(
-        0.0,
-        1.0,
-        caption_text,
+    left_ax.imshow(original_np)
+    left_ax.axis("off")
+    left_ax.text(
+        0.02,
+        0.98,
+        title_lines[0],
+        transform=left_ax.transAxes,
         ha="left",
         va="top",
-        fontsize=10.5,
-        color=accent_color,
+        fontsize=10.2,
+        color="white",
         fontweight="bold",
-        transform=ax_caption.transAxes,
-        wrap=True,
+        bbox=dict(facecolor="black", alpha=0.6, edgecolor="none", pad=3),
     )
 
-    ax_overlay.imshow(overlay_np)
-    ax_overlay.axis("off")
+    right_ax.imshow(overlay_np)
+    right_ax.axis("off")
+    right_ax.text(
+        0.02,
+        0.98,
+        "\n".join(title_lines[1:]),
+        transform=right_ax.transAxes,
+        ha="left",
+        va="top",
+        fontsize=10.0,
+        color="white",
+        fontweight="bold",
+        bbox=dict(facecolor=accent_color, alpha=0.68, edgecolor="none", pad=3),
+        wrap=True,
+    )
 
     fig.savefig(output_path, dpi=220, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
@@ -220,9 +218,8 @@ def get_gradcam_for_model(model_name="resnet50"):
         overlay_correct = generate_heatmap(img_np, grayscale_cam)
         pair_paths[(cls, "correct")] = PAIR_DIR / f"{cls}_correct_pair.png"
         correct_lines = [
-            f"Lớp {CLASS_NAMES[cls]}",
-            f"✓ DỰ ĐOÁN ĐÚNG: {pred} (Độ tin cậy: {conf*100:.1f}%)",
-            f"Tập trung: {FOCUS_NOTES[cls][0]}",
+            f"True label: {gt}",
+            f"✓ Predict: {pred} ({conf*100:.1f}%)",
         ]
         render_pair_panel(img_np, overlay_correct, correct_lines, pair_paths[(cls, "correct")], "green")
         
@@ -240,9 +237,8 @@ def get_gradcam_for_model(model_name="resnet50"):
         overlay_wrong = generate_heatmap(img_np_w, grayscale_cam_w)
         pair_paths[(cls, "wrong")] = PAIR_DIR / f"{cls}_wrong_pair.png"
         wrong_lines = [
-            f"Lớp {CLASS_NAMES[cls]}",
-            f"✗ DỰ ĐOÁN SAI: Nhầm {gt} → {pred_w} (Độ tin cậy: {conf_w*100:.1f}%)",
-            f"Nguyên nhân: {FOCUS_NOTES[cls][1]}",
+            f"True label: {gt}",
+            f"✗ Predict: {pred_w} ({conf_w*100:.1f}%)",
         ]
         render_pair_panel(img_np_w, overlay_wrong, wrong_lines, pair_paths[(cls, "wrong")], "darkred")
 

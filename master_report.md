@@ -1,12 +1,3 @@
-# BÁO CÁO TỔNG KẾT ĐỒ ÁN MÔN THỊ GIÁC MÁY TÍNH (HK253)
-# MASTER REPORT: HỆ THỐNG PHÂN LOẠI ẢNH CÁC CÔNG TRÌNH DI SẢN KIẾN TRÚC TẠI TP. HỒ CHÍ MINH
-
-> **Tên đề tài:** Xây dựng và đánh giá các mô hình CNN & Vision Transformer trong phân loại ảnh các công trình di sản kiến trúc tại TP. HCM  
-> **Môn học:** Thị giác máy tính (Computer Vision) - HK253  
-> **Repository:** [dpduc313/architectural_classifier](https://github.com/dpduc313/architectural_classifier)  
-> **Ngày hoàn thành:** 03/08/2026
-
-> **Bản xem thuận tiện:** [PDF](./results/master_report.pdf) | [HTML](./results/master_report.html)
 
 ---
 
@@ -22,6 +13,9 @@
 8. [TÀI LIỆU THAM KHẢO (REFERENCES)](#tai-lieu-tham-khao)
 
 ---
+
+
+
 
 <a id="chuong-1-gioi-thieu-de-tai"></a>
 ## CHƯƠNG 1: GIỚI THIỆU ĐỀ TÀI (INTRODUCTION)
@@ -45,15 +39,15 @@ Bộ dữ liệu gốc ban đầu được cung cấp bao gồm **137 công trì
 
 #### Cấu trúc và Thách thức từ Dữ liệu Gốc Ban đầu:
 - **Quy mô Dữ liệu Gốc Ban đầu (Initial Raw Dataset >10,000 Photos):**
-  - Bộ dữ liệu ban đầu tập hợp **10,000+ bức ảnh toàn cảnh** các công trình kiến trúc (tương ứng 137 thư mục tòa nhà độc lập) tại TP.HCM và Hà Nội, với kích thước ảnh rất lớn (lên tới $6000 \times 4000$ pixels).
+  - Bộ dữ liệu ban đầu tập hợp **10,000+ bức ảnh** các công trình kiến trúc (tương ứng 137 thư mục tòa nhà độc lập) tại TP.HCM và Hà Nội.
 - **Quy trình Lọc Nhiễu Sơ bộ bằng Vector Embedding DINOv2 (Near-Duplicate & Outlier Detection):**
   - Để giải quyết vấn đề ảnh trùng lặp và ảnh rác ngoại lệ ngay từ ảnh gốc, hệ thống sử dụng module [execution/compute_embeddings.py](execution/compute_embeddings.py) trích xuất **DINOv2 Feature Embeddings** cho toàn bộ 10,000+ bức ảnh gốc:
-    1. *Lọc Ảnh Trùng lặp (Near-Duplicate Detection - [execution/detect_duplicates.py](execution/detect_duplicates.py)):* Tính **Cosine Similarity** giữa các vectơ biểu diễn DINOv2 trong không gian đặc trưng. Áp dụng ngưỡng tương đồng `similarity_threshold = 0.97` kết hợp với thuật toán **Union-Find Clustering** để gom nhóm và loại bỏ các bức ảnh bị chụp lặp góc hoặc trùng lặp góc máy.
-    2. *Lọc Ảnh Ngoại lệ / Dị biệt (Outlier Detection - [execution/detect_outliers.py](execution/detect_outliers.py)):* Tính khoảng cách **Cosine Distance** giữa vectơ DINOv2 của từng ảnh với **Vectơ Tâm Lớp (Class Centroid Vector)** của lớp phong cách tương ứng. Phát hiện và lọc bớt 5% ảnh ngoại lệ xa tâm nhất (các bức ảnh chụp quá xa, mờ nhòe hoặc không mang đặc trưng đại diện cho phong cách).
-  - *Kết quả Lọc Sơ bộ:* Từ **10,000+ ảnh gốc ban đầu**, quy trình lọc DINOv2 đã tinh lọc còn **`8,405` bức ảnh gốc sạch, chất lượng cao** (`7,344` ảnh thuộc 102 tòa nhà chuẩn hóa và `1,120` ảnh thuộc 35 tòa nhà reference).
+    1. *Lọc Ảnh Trùng lặp (Near-Duplicate Detection - [execution/detect_duplicates.py](execution/detect_duplicates.py)):* Tính **Cosine Similarity** giữa các vector biểu diễn DINOv2 trong không gian đặc trưng. Áp dụng ngưỡng tương đồng `similarity_threshold = 0.95` kết hợp với thuật toán **Union-Find Clustering** để gom nhóm và loại bỏ các bức ảnh gần như trùng lặp trong cùng một thư mục.
+    2. *Lọc Ảnh Ngoại lệ / Dị biệt (Outlier Detection - [execution/detect_outliers.py](execution/detect_outliers.py)):* Tính khoảng cách **Cosine Distance** giữa vector DINOv2 của từng ảnh với **Vector Tâm Lớp (Class Centroid Vector)** của lớp phong cách tương ứng. Phát hiện và lọc bớt 5% ảnh ngoại lệ xa tâm nhất (các bức ảnh chụp quá xa, mờ nhòe hoặc không mang đặc trưng đại diện cho phong cách).
+  - *Kết quả Lọc Sơ bộ:*  Phát hiện và xử lý chính xác 314 outliers, 897 duplicates, giữ lại tổng cộng khoảng 9500 ảnh gốc.
 - **5 Thách thức Cốt lõi của Dữ liệu Gốc Ban đầu:**
-  1. *Ảnh Kích thước Rất lớn & Mất mát Thông tin:* Việc đưa 8,405 bức ảnh $6000 \times 4000$ trực tiếp vào mạng Deep Learning gây quá tải VRAM GPU, còn nếu nén ảnh trực tiếp (downscale) về $224 \times 224$ sẽ làm toàn bộ chi tiết hoa văn vi mô quý giá (phào chỉ, cửa vòm, đầu đao) bị nhòe và biến mất hoàn toàn.
-  2. *Mất Cân bằng Lớp Nghiêm trọng (Class Imbalance):* Số lượng mẫu giữa 4 lớp phong cách có sự chênh lệch lớn (lớp A1 Pháp cổ và B1 Hiện đại chiếm số lượng áp đảo so với A2 Tân cổ điển và B2 Đương đại), gây ra hiện tượng thiên vị (bias) trong quá trình mô hình phân loại.
+  1. *Ảnh Kích thước Lớn & Mất mát Thông tin:* Việc đưa 9500 bức ảnh $6000 \times 4000$ trực tiếp vào mạng Deep Learning gần như chắc chắn sẽ gây quá tải VRAM GPU, trong khi đó nếu nén ảnh trực tiếp (downscale) về $224 \times 224$ sẽ làm toàn bộ chi tiết hoa văn vi mô quý giá (phào chỉ, cửa vòm, đầu đao) bị nhòe và biến mất hoàn toàn. Chưa kể đến bài toán crop/distort ảnh gốc hình chữ nhật thành hình vuông. 
+  2. *Mất Cân bằng Lớp Nghiêm trọng (Class Imbalance):* Số lượng mẫu giữa 4 lớp phong cách có sự chênh lệch lớn (lớp A1 Pháp cổ và B1 Hiện đại chiếm số lượng áp đảo so với A2 Tân cổ điển và B2 Đương đại), tiềm ẩn nguy cơ gây ra hiện tượng thiên vị (bias) trong quá trình mô hình phân loại.
   3. *Hạn chế về Số lượng Tòa nhà (`building_id` Diversity):* Tổng số lượng công trình chuẩn hóa chỉ có 102 tòa nhà. Nếu phân chia dữ liệu ngẫu nhiên theo patch thay vì theo `building_id`, mô hình sẽ bị **Rò rỉ Dữ liệu (Data Leakage)** nghiêm trọng và "học thuộc" bối cảnh tòa nhà thay vì học phong cách kiến trúc.
   4. *Nhiễu Bối cảnh Đô thị Phức tạp (Urban Noise):* Bức ảnh chụp thực tế chứa lượng lớn thành phần không liên quan: bầu trời rộng lớn, mạng lưới dây điện chăng chịt, cột điện, mặt đường nhựa, xe cộ và cây cối che khuất mặt tiền.
   5. *Nhiễu do Điều kiện Chụp Đa dạng (Shooting Variance):*
@@ -61,11 +55,10 @@ Bộ dữ liệu gốc ban đầu được cung cấp bao gồm **137 công trì
      - **Thời gian & Ánh sáng chụp:** Thời điểm chụp khác nhau (nắng gắt, cháy sáng, bóng râm, chạng vạng) và ảnh tư liệu lịch sử bị mất màu hoặc mờ nét.
      - **Thiết bị chụp không đồng nhất:** Ảnh thu thập từ nhiều thiết bị khác nhau (máy ảnh chuyên dụng DSLR, máy ảnh cơ cổ điển, smartphone) với tiêu cự, độ phân giải, độ sắc nét và sắc thái màu sắc khác nhau.
 
-- **Chiến lược Phân mảnh Ảnh (Patching Strategy - Từ ~10k Ảnh Gốc thành 183,674 Patches):**
-  - Nhận thấy ảnh gốc kích thước lớn ($6000 \times 4000$) là một **cơ hội tuyệt vời để làm tăng tính đa dạng mẫu và phong cách (sample & style diversity)**, nhóm nghiên cứu đã áp dụng kỹ thuật phân mảnh ảnh.
+- **Chiến lược Phân mảnh Ảnh:**
   - Mỗi bức ảnh $6000 \times 4000$ được chia nhỏ thành các patch hình vuông có kích thước **$1000 \times 1000$ pixels**.
-  - **Ưu điểm của Tỷ lệ Hình vuông $1:1$:** Giúp quá trình rescale về kích thước đầu vào tiêu chuẩn của các mô hình học sâu ($224 \times 224$ cho ResNet/ViT/DINOv2 hoặc $384 \times 384$ cho Swin V2) diễn ra tự nhiên, **hoàn toàn không bị biến dạng tỷ lệ (no distortion)**, không cần thêm viền đen (zero-padding) hay cắt bỏ lề (center crop loss).
-  - **Kết quả Chuyển đổi:** Biến bộ dữ liệu ảnh gốc ban đầu (~10,000 ảnh) thành bộ dữ liệu khổng lồ **183,674 patches**, ép các mô hình tập trung trích xuất sâu các chi tiết kiến trúc vi mô (mái ngói âm dương, bờ gờ uốn cong, phào chỉ, hoa văn vòm cửa, mảng kính) thay vì thông tin nền không liên quan.
+  - **Ưu điểm của Tỷ lệ Hình vuông $1:1$:** Giúp quá trình rescale về kích thước đầu vào tiêu chuẩn của các mô hình học sâu ($224 \times 224$ cho ResNet/ViT/DINOv2 hoặc $384 \times 384$ cho Swin V2) diễn ra tự nhiên, **hoàn toàn không bị biến dạng tỷ lệ**, không cần thêm viền đen hay cắt bỏ lề.
+  - **Kết quả Chuyển đổi:** Biến bộ dữ liệu ảnh gốc ban đầu thành bộ dữ liệu khổng lồ **183,674 patches**, ép các mô hình tập trung trích xuất sâu các chi tiết kiến trúc vi mô (mái ngói âm dương, bờ gờ uốn cong, phào chỉ, hoa văn vòm cửa, mảng kính) thay vì thông tin nền không liên quan.
 
 - **Quá trình Lọc 183,674 Patches qua 2 Phương pháp & Tác động đến Kết quả Huấn luyện (Tham chiếu Chương 3 & Chương 5):**
   1. *Phương pháp 1: Lọc Tự động bằng YOLOv8 (Kiến trúc Phân đoạn Tòa nhà):*
@@ -74,7 +67,7 @@ Bộ dữ liệu gốc ban đầu được cung cấp bao gồm **137 công trì
        $$M = \bigvee_{i=1}^{K} (Mask_i > 0.5)$$
        Tỷ lệ diện tích tòa nhà (Building Ratio) được tính bằng trung bình số pixel của mặt nạ gộp trên tổng số pixel của patch:
        $$\text{Building Ratio} = \frac{1}{H \times W} \sum_{y=1}^{H} \sum_{x=1}^{W} M(y, x)$$
-       Patch được giữ lại nếu tỷ lệ diện tích tòa nhà đạt tối thiểu 1.8% (`building_ratio >= 0.018`).
+       Patch được giữ lại nếu tỷ lệ diện tích tòa nhà đạt tối thiểu ngưỡng (`building_ratio >= threshold`).
      - **Kết quả Lọc lần đầu:** Giữ lại **85,991 patches** và loại bỏ **97,683 patches** vào pool rác.
      - **Kết quả Huấn luyện Thử nghiệm Đợt 1 (trên 86k patches do YOLOv8 lọc):**
 
@@ -87,14 +80,16 @@ Bộ dữ liệu gốc ban đầu được cung cấp bao gồm **137 công trì
 | **ViT-B/16** | Transformer (Flat Patch) | 86.0M | 17.6G | 95.42% | 43.54% | 0.4042 |
 | **Swin-V2-T** | Transformer (Hierarchical Window) | 28.0M | 4.5G | 94.01% | 42.89% | 0.3877 |
 
-![Kết quả huấn luyện trên 86k patches do YOLOv8 lọc](./outputs/figures/yolo_phase1_results.png)  
-*Hình 1.1: Bảng kết quả đánh giá hiệu năng thử nghiệm Đợt 1 trên 85,991 patches do YOLOv8 lọc tự động. Kết quả cho thấy mô hình tốt nhất (DINOv2-S) chỉ đạt 52.20% Test Accuracy và Macro-F1 0.4980, bị giới hạn nặng nề bởi nhiễu và việc mất mát thông tin.*
 
-     - **Hạn chế:** YOLOv8 chỉ học nhận diện hình dáng tổng thể của cả tòa nhà (cửa ra vào, tường ngoài, mái lớn). Do đó, mô hình này bị "mù màu" đối với các **chi tiết kiến trúc vi mô** (hoa văn điêu khắc Pháp cổ, bờ đao, phào chỉ nhỏ, hoa văn cổng sắt di sản) nằm trong các patch chụp cận cảnh, dẫn tới việc loại bỏ sai hàng chục nghìn mẫu vật có giá trị học sâu cao và làm hiệu năng phân loại bị kìm hãm dưới mức 53%.
+*Bảng 1: Bảng kết quả đánh giá hiệu năng thử nghiệm trên 85,991 patches do YOLOv8 lọc tự động. Kết quả cho thấy mô hình tốt nhất (DINOv2-S) chỉ đạt 52.20% Test Accuracy và Macro-F1 0.4980, bị giới hạn nặng nề bởi nhiễu và việc mất mát thông tin.*
+
+Điều này chỉ ra rằng, việc patching dữ liệu khiến một hình ảnh gốc được chia nhỏ thành 24 hình, 24 hình này sau đó dều được gắn nhãn giống như hình gốc, trong khi chỉ có một phần diện tích của hình gốc là chứa kiến trúc, còn lại là nhiễu nền, dẫn tới các patch không chứa thông tin kiến trúc coi như đang bị gắn sai nhãn, ảnh hưởng đến cả quá trình học của mô hình lẫn tính khách quan của test set và val set.
+
+
   2. *Phương pháp 2: Quy trình Kiểm duyệt Thủ công 100% (100% Full Manual Human Curation Protocol):*
-     - Nhóm nghiên cứu thực hiện review thủ công 100% toàn bộ **183,674 patches** ở cả 2 danh mục, phân loại nhãn phụ nhị phân `architectural` ($1$) vs `non-architectural` ($0$).
-     - *Kết quả đột phá:* **Cứu lại được 32,479 patches kiến trúc quý giá** bị YOLOv8 đánh giá nhầm là rác, nâng tổng số patch kiến trúc chuẩn lên **118,470 patches (64.5%)**, đồng thời cô lập triệt để 65,204 patches nhiễu (bầu trời, dây điện, cột điện).
-     - *Tác động đến Hiệu năng Huấn luyện (Tham chiếu Chương 5):* Việc huấn luyện trên tập dữ liệu đã qua Curation 100% kết hợp với Thuật toán Biểu quyết Cấp độ Ảnh Gốc đã giúp mô hình **Swin Transformer V2 đạt 96.50% Voting Acc** và **Meta DINOv2 đạt 95.80% Voting Acc**, vượt trội hoàn toàn so với việc chỉ huấn luyện trên tập YOLO sơ khai.
+     - Toàn bộ **183,674 patches** sẽ được gắn 1 trong 2 loại nhãn phụ nhị phân `architectural` ($1$) vs `non-architectural` ($0$), quá trình dán nhãn được thực hiện thủ công hoàn toàn bởi con người. 
+     - *Kết quả:* **Hiệu chỉnh lại nhãn cho 32,479 patches kiến trúc quý giá** bị YOLOv8 đánh giá nhầm là rác, nâng tổng số patch kiến trúc chuẩn lên **118,470 patches (64.5%)**, đồng thời cô lập triệt để 65,204 patches nhiễu (bầu trời, dây điện, cột điện).
+     - *Tác động đến Hiệu năng Huấn luyện (Tham chiếu Chương 5):* Việc huấn luyện trên tập dữ liệu đã qua Curation 100% kết hợp với Thuật toán Biểu quyết Cấp độ Ảnh Gốc đã giúp mô hình **Swin Transformer V2 đạt 96.50% Voting Acc** và **Meta DINOv2 đạt 95.80% Voting Acc**, vượt trội hoàn toàn so với việc chỉ huấn luyện trên dữ liệu được lọc bởi YOLO (lần lượt khoảng 50% và 49% trên test set).
 
 - **Thách thức Rò rỉ Dữ liệu (Data Leakage):** Nếu phân chia ngẫu nhiên (Random Split) các patch mà không gom nhóm theo từng tòa nhà gốc, các patch cùng một công trình sẽ xuất hiện đồng thời ở cả tập Train và Test, khiến mô hình bị "học thuộc" và cho kết quả ảo. Do đó, hệ thống áp dụng chia theo ID Tòa nhà (70% Train / 15% Val / 15% Test).
 
@@ -150,12 +145,12 @@ Bộ dữ liệu gồm 4 lớp phong cách kiến trúc chính tại TP. Hồ Ch
 
 ### 3.2 Đề xuất Cách Đánh nhãn & Tinh chỉnh Dữ liệu 100% (Novel 100% Full Dataset Curation Protocol - điểm cộng)
 
-Nhận thấy việc tự động cắt patch bằng YOLOv8 ($\ge 1.8\%$) bỏ sót nhiều patch chứa họa tiết kiến trúc quý giá đồng thời giữ lại nhiều patch rác (bầu trời, dây điện), nhóm nghiên cứu đã xây dựng quy trình **Curation thủ công 100% cho 183,674 patches**:
+Nhận thấy việc tự động cắt patch bằng YOLOv8 bỏ sót nhiều patch chứa họa tiết kiến trúc quý giá đồng thời giữ lại nhiều patch rác (bầu trời, dây điện), nhóm nghiên cứu đã xây dựng quy trình **Curation thủ công 100% cho 183,674 patches**:
 
 ```mermaid
 flowchart TD
-    Raw["Full Master Dataset: 183,674 Patches"] --> PoolA["YOLO >= 1.8% Pool: 85,991 Patches"]
-    Raw --> PoolB["YOLO < 1.8% Pool: 97,683 Patches"]
+    Raw["Full Master Dataset: 183,674 Patches"] --> PoolA["YOLO Kept Pool: 85,991 Patches"]
+    Raw --> PoolB["YOLO Removed Pool: 97,683 Patches"]
     
     PoolA -->|"Manual Human Curation 100%"| KeptClean["Kept Architectural: 85,991 Patches"]
     PoolB -->|"Manual Human Curation 100%"| Rescued["Rescued Architectural: 32,479 Patches"]
@@ -166,16 +161,16 @@ flowchart TD
     FilteredNoise --> NonArch["Noise / Sky Dataset: 65,204 Non-Architectural Patches (Sub-label 0)"]
 ```
 
-#### 3 Tiêu chí Lọc Dữ liệu Nghiêm ngặt:
-1. **Thông tin Kiến trúc (Architectural Information):** Patch phải chứa thông tin rõ ràng (tường, ngói, phù điêu, hoa văn cửa vòm, màu sơn) đại diện cho phong cách.
-2. **Kiểm soát Nhiễu (Noise Control):** Loại bỏ patch chứa rác đô thị: cây cối ngoài công trình, thùng rác, xe cộ, **dây điện, cột điện, mặt đường và bầu trời**.
-3. **Chất lượng Ảnh (Image Quality):** Loại bỏ patch mờ nét, nhòe chuyển động, cháy sáng hoặc quá tối.
+#### Tiêu chí Lọc Dữ liệu:
+1. **Thông tin Kiến trúc:** Patch phải chứa thông tin rõ ràng (tường, ngói, phù điêu, hoa văn cửa vòm, màu sơn) đại diện cho phong cách.
+2. **Loại bỏ Nhiễu:** Loại bỏ patch chứa rác đô thị: cây cối ngoài công trình, thùng rác, xe cộ, dây điện, cột điện, mặt đường và bầu trời.
+3. **Chất lượng Ảnh:** Loại bỏ patch mờ nét, nhòe chuyển động, cháy sáng hoặc quá tối.
 
 #### Bảng Thống kê Curation Đạt được:
 | Danh mục Pool | Tổng số Patch | Đã Review | Số Patch Kiến trúc (`arch_sublabel = 1`) | Số Patch Nhiễu/Sky (`arch_sublabel = 0`) | Tỷ lệ Review |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Kept Pool (YOLO $\ge$ 1.8%)** | 85,991 | 85,991 | 85,991 | 0 | 100.00% |
-| **Filtered Pool (YOLO < 1.8%)** | 97,683 | 97,683 | 32,479 (Cứu lại) | 65,204 | 100.00% |
+| **Kept Pool** | 85,991 | 85,991 | 85,991 | 0 | 100.00% |
+| **Filtered Pool** | 97,683 | 97,683 | 32,479 (Cứu lại) | 65,204 | 100.00% |
 | **TỔNG CỘNG** | **183,674** | **183,674** | **118,470 (64.5%)** | **65,204 (35.5%)** | **100.00%** |
 
 ### 3.3 Phân chia Dữ liệu Chống Rò rỉ (Building-Level Stratified Group Split)
@@ -205,22 +200,22 @@ flowchart TD
     classDef headStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#bf360c
     classDef outputStyle fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#1b5e20
 
-    subgraph Stage1["1. Giai đoạn Đầu vào (Input Layer)"]
+    subgraph Stage1["1. Input Layer"]
         InputPatch["Patch Ảnh Kiến trúc<br/><i>Rescaled 224x224 / 384x384</i>"]:::inputStyle
     end
 
-    subgraph Stage2["2. Bộ Suite 4 Mô hình Trích xuất Đặc trưng (Backbone Suite)"]
+    subgraph Stage2["2. Mô hình Trích xuất Đặc trưng"]
         ResNet50["<b>ResNet-50</b><br/><i>Baseline CNN</i>"]:::modelStyle
         ViT["<b>Vision Transformer (ViT-B/16)</b><br/><i>Flat Patch Attention</i>"]:::modelStyle
         DINOv2["<b>Meta DINOv2</b><br/><i>Self-Supervised ViT</i>"]:::modelStyle
         Swinv2["<b>Swin Transformer V2</b><br/><i>Shifted Window Attention</i>"]:::modelStyle
     end
 
-    subgraph Stage3["3. Đầu Phân loại Đa nhiệm (Dual Multi-Task Classifier Head)"]
+    subgraph Stage3["3. Multi-Task Classifier Head"]
         FCHead["<b>Shared Linear Layer & Dropout</b><br/><i>Tổng hợp Vectơ Đặc trưng</i>"]:::headStyle
     end
 
-    subgraph Stage4["4. Kết quả Đầu ra Đa nhiệm (Multi-Task Outputs)"]
+    subgraph Stage4["4. Output"]
         OutputStyle["<b>Nhiệm vụ 1 (Chính):</b><br/>Phân loại 4 Phong cách Kiến trúc<br/>(A1, A2, B1, B2)"]:::outputStyle
         OutputArch["<b>Nhiệm vụ 2 (Nhãn phụ):</b><br/>Lọc Nhiễu Nhị phân<br/>(Architectural vs Non-Architectural)"]:::outputStyle
     end
@@ -394,7 +389,7 @@ $$\phi_i = \sum_{S \subseteq F \setminus \{i\}} \frac{|S|!(|F| - |S| - 1)!}{|F|!
 
 <a id="chuong-8-tai-lieu-tham-khao"></a>
 ## TÀI LIỆU THAM KHẢO (REFERENCES)
-
+0. **Repository:** [dpduc313/architectural_classifier](https://github.com/dpduc313/architectural_classifier) 
 1. **He, K., Zhang, X., Ren, S., & Sun, J. (2016).** Deep residual learning for image recognition. In *Proceedings of the IEEE conference on computer vision and pattern recognition (CVPR)* (pp. 770-778).
 2. **Dosovitskiy, A., et al. (2020).** An image is worth 16x16 words: Transformers for image recognition at scale. *arXiv preprint arXiv:2010.11929*.
 3. **Liu, Z., et al. (2022).** Swin transformer v2: Scaling up capacity and resolution. In *Proceedings of the IEEE/CVF conference on computer vision and pattern recognition (CVPR)* (pp. 12009-12019).
