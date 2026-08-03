@@ -6,6 +6,8 @@
 > **Repository:** [dpduc313/architectural_classifier](https://github.com/dpduc313/architectural_classifier)  
 > **Ngày hoàn thành:** 03/08/2026
 
+> **Bản xem thuận tiện:** [PDF](./master_report.pdf) | [HTML](./master_report.html)
+
 ---
 
 ## MỤC LỤC
@@ -338,18 +340,17 @@ flowchart LR
 ![Bản đồ Chú ý Grad-CAM 4 Lớp](./outputs/figures/gradcam_best_model.png)  
 *Hình 5: Lưới trực quan hóa bản đồ nhiệt Grad-CAM trên 4 lớp phong cách kiến trúc (A1, A2, B1, B2). Cột bên trái hiển thị các mẫu dự đoán ĐÚNG (vùng đỏ/vàng tập trung vào hoa văn di sản), Cột bên phải hiển thị các mẫu dự đoán SAI (phân tích các vùng bị thu hút nhầm lẫn).*
 
-#### 6.1.2 Phân tích Sâu Cơ chế Chú ý & Nguyên nhân Nhầm lẫn
+#### 6.1.2 Bảng Thống kê Độ tin cậy Dự đoán Grad-CAM trên 4 Lớp
 
-| Lớp Kiến trúc | Mẫu Dự đoán ĐÚNG (True Positive) | Mẫu Dự đoán SAI (Misclassified) | Nguyên nhân Kỹ thuật & Hành vi của Mô hình |
-|---|---|---|---|
-| **A1 (Pre-1986 Colonial)** | **GT: A1 → Pred: A1** (Độ tin cậy: **98.2%**)<br/>*Vùng chú ý:* Kích hoạt mạnh tại các cửa sổ vòm gạch Pháp cổ, phào chỉ đắp nổi và mái ngói cổ. | **GT: A1 → Pred: A2** (Độ tin cậy: **64.5%**)<br/>*Vùng chú ý:* Tập trung vào hệ cột tròn đối xứng phẳng. | Nhầm lẫn giữa Pháp cổ và Tân cổ điển do cả 2 phong cách đều sử dụng hệ cột La Mã đối xứng; mô hình thiếu thông tin mái vòm trong patch cận cảnh. |
-| **A2 (Post-1986 Neo-Colonial)** | **GT: A2 → Pred: A2** (Độ tin cậy: **94.7%**)<br/>*Vùng chú ý:* Tập trung vào mảng tường bê tông sơn trắng phẳng và gờ chỉ tân cổ tối giản. | **GT: A2 → Pred: A1** (Độ tin cậy: **58.1%**)<br/>*Vùng chú ý:* Kích hoạt tại mảng tường cổ chưa được sơn lại. | Patch chứa vết ố màu tư liệu làm mô hình nhận diện nhầm yếu tố "màu thời gian" của kiến trúc A1 cổ điển. |
-| **B1 (Pre-1986 Modern)** | **GT: B1 → Pred: B1** (Độ tin cậy: **96.1%**)<br/>*Vùng chú ý:* Tập trung chính xác vào hệ lam gió bê tông (louvers) và ô văng che nắng nhiệt đới. | **GT: B1 → Pred: B2** (Độ tin cậy: **61.3%**)<br/>*Vùng chú ý:* Bị phân tán bởi khung cửa kính cường lực mới lắp. | Công trình B1 đã qua cải tạo hiện đại hóa (lắp thêm kính), khiến mô hình bị thu hút bởi vật liệu kính của phong cách B2. |
-| **B2 (Post-1986 Contemporary)** | **GT: B2 → Pred: B2** (Độ tin cậy: **99.0%**)<br/>*Vùng chú ý:* Kích hoạt toàn bộ trên bề mặt vách kính phản quang và kết cấu thép đương đại. | **GT: B2 → Pred: B1** (Độ tin cậy: **55.4%**)<br/>*Vùng chú ý:* Tập trung vào các đường gờ ngang trang trí. | Thiết kế B2 cách điệu các đường gờ ngang tạo cảm giác tạo hình khối giống với hệ lam che nắng của kiến trúc B1. |
-
+| Lớp Kiến trúc | Mẫu Dự đoán ĐÚNG (True Positive) | Mẫu Dự đoán SAI (Misclassified) |
+|---|---|---|
+| **A1 (Pre-1986 Colonial)** | **GT: A1 → Pred: A1** (Độ tin cậy: **98.2%**) | **GT: A1 → Pred: A2** (Độ tin cậy: **64.5%**) |
+| **A2 (Post-1986 Neo-Colonial)** | **GT: A2 → Pred: A2** (Độ tin cậy: **94.7%**) | **GT: A2 → Pred: A1** (Độ tin cậy: **58.1%**) |
+| **B1 (Pre-1986 Modern)** | **GT: B1 → Pred: B1** (Độ tin cậy: **96.1%**) | **GT: B1 → Pred: B2** (Độ tin cậy: **61.3%**) |
+| **B2 (Post-1986 Contemporary)** | **GT: B2 → Pred: B2** (Độ tin cậy: **99.0%**) | **GT: B2 → Pred: B1** (Độ tin cậy: **55.4%**) |
 
 #### Kết luận từ Phân tích Grad-CAM:
-- **Lớp A1 (Pre-1986 Colonial):** Attention Heatmap tập trung cường độ cao vào **mái ngói cổ, hoa văn vòm gạch và đầu cột đắp nổi**.
+- **Lớp A1 (Pre-1986 Colonial):** Attention Heatmap tập trung vào **mái ngói cổ, hoa văn vòm gạch và đầu cột đắp nổi**.
 - **Lớp A2 (Post-1986 Neo-Colonial):** Heatmap tập trung vào **mặt tiền sơn trắng, gờ chỉ tân cổ điển tối giản và cột tròn**.
 - **Lớp B1 (Pre-1986 Modern):** Heatmap tập trung vào **hệ lam gió bê tông (louvers), ô văng che nắng nhiệt đới và mảng tường bê tông mỏng**.
 - **Lớp B2 (Post-1986 Contemporary):** Heatmap tập trung vào **vách kính phản quang lớn, khung kết cấu thép và mảng trang trí đương đại**.

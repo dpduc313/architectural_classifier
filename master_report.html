@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Master Report</title>
+  <style>
+:root {
+  color-scheme: light;
+}
+
+@page {
+  size: A4;
+  margin: 16mm 14mm 18mm;
+}
+
+html, body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.45;
+  color: #111;
+  background: #fff;
+}
+
+body {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 18px 20px 32px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  margin: 1.1em 0 0.45em;
+  page-break-after: avoid;
+}
+
+h1 { font-size: 24pt; }
+h2 { font-size: 17pt; border-bottom: 1px solid #ddd; padding-bottom: 0.2em; }
+h3 { font-size: 13pt; }
+h4 { font-size: 11.5pt; }
+
+p, ul, ol, blockquote, table, pre {
+  margin: 0.45em 0 0.85em;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0.6em auto;
+}
+
+figure {
+  margin: 0.75em 0 1em;
+}
+
+code, pre {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 9.5pt;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #f6f8fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 10px 12px;
+  overflow-x: auto;
+}
+
+code {
+  background: #f6f8fa;
+  border-radius: 4px;
+  padding: 0.1em 0.3em;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  page-break-inside: auto;
+}
+
+thead {
+  display: table-header-group;
+}
+
+tfoot {
+  display: table-footer-group;
+}
+
+tr {
+  page-break-inside: avoid;
+  page-break-after: auto;
+}
+
+th, td {
+  border: 1px solid #d0d7de;
+  padding: 6px 8px;
+  vertical-align: top;
+}
+
+th {
+  background: #f3f4f6;
+  font-weight: 700;
+}
+
+blockquote {
+  border-left: 4px solid #cbd5e1;
+  padding-left: 12px;
+  color: #374151;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #ddd;
+  margin: 1.2em 0;
+}
+
+.mermaid {
+  white-space: pre-wrap;
+  background: #fcfcfc;
+}
+
+@media print {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+</style>
+</head>
+<body>
+<h1>BÁO CÁO TỔNG KẾT ĐỒ ÁN MÔN THỊ GIÁC MÁY TÍNH (HK253)</h1>
+<h1>MASTER REPORT: HỆ THỐNG PHÂN LOẠI ẢNH CÁC CÔNG TRÌNH DI SẢN KIẾN TRÚC TẠI TP. HỒ CHÍ MINH</h1>
+<blockquote>
+<p><strong>Tên đề tài:</strong> Xây dựng và đánh giá các mô hình CNN &amp; Vision Transformer trong phân loại ảnh các công trình di sản kiến trúc tại TP. HCM<br>
+<strong>Môn học:</strong> Thị giác máy tính (Computer Vision) - HK253<br>
+<strong>Repository:</strong> <a href="https://github.com/dpduc313/architectural_classifier">dpduc313/architectural_classifier</a><br>
+<strong>Ngày hoàn thành:</strong> 03/08/2026</p>
+</blockquote>
+<hr>
+<h2>MỤC LỤC</h2>
+<ol>
+<li><a href="#chuong-1-gioi-thieu-de-tai">CHƯƠNG 1: GIỚI THIỆU ĐỀ TÀI (INTRODUCTION)</a></li>
+<li><a href="#chuong-2-tom-tat-nghien-cuu-lien-quan">CHƯƠNG 2: TÓM TẮT NGHIÊN CỨU LIÊN QUAN (RELATED WORKS)</a></li>
+<li><a href="#chuong-3-mo-ta-chi-tiet-qua-trinh-chuan-bi-du-lieu">CHƯƠNG 3: MÔ TẢ CHI TIẾT QUÁ TRÌNH CHUẨN BỊ DỮ LIỆU &amp; ĐỀ XUẤT ĐÁNH NHÃN ĐỘC ĐÁO</a></li>
+<li><a href="#chuong-4-phuong-phap-nghien-cuu--kien-truc-mo-hinh">CHƯƠNG 4: PHƯƠNG PHÁP NGHIÊN CỨU &amp; KIẾN TRÚC MÔ HÌNH (METHODOLOGY)</a></li>
+<li><a href="#chuong-5-trien-khai-huan-luyen--danh-gia-hieu-qua">CHƯƠNG 5: TRIỂN KHAI HUẤN LUYỆN &amp; ĐÁNH GIÁ HIỆU QUẢ (EXPERIMENTAL RESULTS)</a></li>
+<li><a href="#chuong-6-giai-thich-mo-hinh-voi-explainable-ai">CHƯƠNG 6: GIẢI THÍCH MÔ HÌNH VỚI EXPLAINABLE AI (XAI: GRAD-CAM &amp; SHAP)</a></li>
+<li><a href="#chuong-7-ket-luan-va-huong-phat-trien-tiep-theo">CHƯƠNG 7: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN TIẾP THEO</a></li>
+<li><a href="#tai-lieu-tham-khao">TÀI LIỆU THAM KHẢO (REFERENCES)</a></li>
+</ol>
+<hr>
+<p><a id="chuong-1-gioi-thieu-de-tai"></a></p>
+<h2>CHƯƠNG 1: GIỚI THIỆU ĐỀ TÀI (INTRODUCTION)</h2>
+<h3>1.1 Bài toán Thị giác Máy tính &amp; Ứng dụng Thực tế (Computer Vision Task &amp; Applications)</h3>
+<p>Thị giác Máy tính (Computer Vision) là một lĩnh vực của Trí tuệ Nhân tạo hướng tới việc giúp máy tính có khả năng "nhìn", hiểu và trích xuất thông tin ngữ cảnh từ hình ảnh hoặc video số. Trong đồ án này, bài toán đặt ra là <strong>Phân loại Ảnh Kiến trúc đa lớp (Multi-Class Architectural Style Image Classification)</strong> — một bài toán thuộc lĩnh vực nhận dạng mẫu (Pattern Recognition) và học sâu (Deep Learning).</p>
+<h4>Các ứng dụng tiềm năng của dự án trong Bảo tồn Kiến trúc:</h4>
+<ol>
+<li><strong>Số hóa và Lưu trữ Di sản Số (Digital Heritage Archiving):</strong> Tự động phân loại, lưu trữ và quản lý hàng nghìn bức ảnh công trình di sản tại TP. Hồ Chí Minh mà không phụ thuộc vào việc gán nhãn thủ công tốn thời gian.</li>
+<li><strong>Quy hoạch Đô thị và Quản lý Đô thị Thông minh (Smart City Planning):</strong> Hỗ trợ các cơ quan quản lý nhận diện nhanh các công trình mang giá trị lịch sử - kiến trúc cần được bảo tồn trước khi thực hiện cải tạo đô thị.</li>
+<li><strong>Ứng dụng Du lịch và Giáo dục Thông minh (Smart Tourism &amp; Education):</strong> Cung cấp lõi công nghệ cho các ứng dụng di động cho phép du khách quét (scan) công trình di sản và nhận thông tin tự động về phong cách kiến trúc, niên đại và lịch sử.</li>
+</ol>
+<hr>
+<h3>1.2 Đặc điểm Bộ Dữ liệu (Dataset Characteristics)</h3>
+<p>Bộ dữ liệu gốc ban đầu được cung cấp bao gồm <strong>137 công trình kiến trúc</strong> tại Thành phố Hồ Chí Minh và Hà Nội, được gán nhãn theo 4 lớp phong cách:
+1. <strong>A1 (pre-1986-colonial):</strong> Kiến trúc thuộc địa Pháp cổ và phong cách cổ điển trước năm 1986.
+2. <strong>A2 (post-1986-colonial):</strong> Kiến trúc thuộc địa phong cách Tân cổ điển xây dựng tái thiết sau năm 1986.
+3. <strong>B1 (pre-1986-modern):</strong> Kiến trúc hiện đại / nhiệt đới trước năm 1986.
+4. <strong>B2 (post-1986-modern):</strong> Kiến trúc hiện đại đương đại xây dựng sau năm 1986.</p>
+<h4>Cấu trúc và Thách thức từ Dữ liệu Gốc Ban đầu:</h4>
+<ul>
+<li><strong>Quy mô Dữ liệu Gốc Ban đầu (Initial Raw Dataset &gt;10,000 Photos):</strong></li>
+<li>Bộ dữ liệu ban đầu tập hợp <strong>10,000+ bức ảnh toàn cảnh</strong> các công trình kiến trúc (tương ứng 137 thư mục tòa nhà độc lập) tại TP.HCM và Hà Nội, với kích thước ảnh rất lớn (lên tới $6000 \times 4000$ pixels).</li>
+<li><strong>Quy trình Lọc Nhiễu Sơ bộ bằng Vector Embedding DINOv2 (Near-Duplicate &amp; Outlier Detection):</strong></li>
+<li>Để giải quyết vấn đề ảnh trùng lặp và ảnh rác ngoại lệ ngay từ ảnh gốc, hệ thống sử dụng module <a href="execution/compute_embeddings.py">execution/compute_embeddings.py</a> trích xuất <strong>DINOv2 Feature Embeddings</strong> cho toàn bộ 10,000+ bức ảnh gốc:<ol>
+<li><em>Lọc Ảnh Trùng lặp (Near-Duplicate Detection - <a href="execution/detect_duplicates.py">execution/detect_duplicates.py</a>):</em> Tính <strong>Cosine Similarity</strong> giữa các vectơ biểu diễn DINOv2 trong không gian đặc trưng. Áp dụng ngưỡng tương đồng <code>similarity_threshold = 0.97</code> kết hợp với thuật toán <strong>Union-Find Clustering</strong> để gom nhóm và loại bỏ các bức ảnh bị chụp lặp góc hoặc trùng lặp góc máy.</li>
+<li><em>Lọc Ảnh Ngoại lệ / Dị biệt (Outlier Detection - <a href="execution/detect_outliers.py">execution/detect_outliers.py</a>):</em> Tính khoảng cách <strong>Cosine Distance</strong> giữa vectơ DINOv2 của từng ảnh với <strong>Vectơ Tâm Lớp (Class Centroid Vector)</strong> của lớp phong cách tương ứng. Phát hiện và lọc bớt 5% ảnh ngoại lệ xa tâm nhất (các bức ảnh chụp quá xa, mờ nhòe hoặc không mang đặc trưng đại diện cho phong cách).</li>
+</ol>
+</li>
+<li><em>Kết quả Lọc Sơ bộ:</em> Từ <strong>10,000+ ảnh gốc ban đầu</strong>, quy trình lọc DINOv2 đã tinh lọc còn <strong><code>8,405</code> bức ảnh gốc sạch, chất lượng cao</strong> (<code>7,344</code> ảnh thuộc 102 tòa nhà chuẩn hóa và <code>1,120</code> ảnh thuộc 35 tòa nhà reference).</li>
+<li>
+<p><strong>5 Thách thức Cốt lõi của Dữ liệu Gốc Ban đầu:</strong>
+  1. <em>Ảnh Kích thước Rất lớn &amp; Mất mát Thông tin:</em> Việc đưa 8,405 bức ảnh $6000 \times 4000$ trực tiếp vào mạng Deep Learning gây quá tải VRAM GPU, còn nếu nén ảnh trực tiếp (downscale) về $224 \times 224$ sẽ làm toàn bộ chi tiết hoa văn vi mô quý giá (phào chỉ, cửa vòm, đầu đao) bị nhòe và biến mất hoàn toàn.
+  2. <em>Mất Cân bằng Lớp Nghiêm trọng (Class Imbalance):</em> Số lượng mẫu giữa 4 lớp phong cách có sự chênh lệch lớn (lớp A1 Pháp cổ và B1 Hiện đại chiếm số lượng áp đảo so với A2 Tân cổ điển và B2 Đương đại), gây ra hiện tượng thiên vị (bias) trong quá trình mô hình phân loại.
+  3. <em>Hạn chế về Số lượng Tòa nhà (<code>building_id</code> Diversity):</em> Tổng số lượng công trình chuẩn hóa chỉ có 102 tòa nhà. Nếu phân chia dữ liệu ngẫu nhiên theo patch thay vì theo <code>building_id</code>, mô hình sẽ bị <strong>Rò rỉ Dữ liệu (Data Leakage)</strong> nghiêm trọng và "học thuộc" bối cảnh tòa nhà thay vì học phong cách kiến trúc.
+  4. <em>Nhiễu Bối cảnh Đô thị Phức tạp (Urban Noise):</em> Bức ảnh chụp thực tế chứa lượng lớn thành phần không liên quan: bầu trời rộng lớn, mạng lưới dây điện chăng chịt, cột điện, mặt đường nhựa, xe cộ và cây cối che khuất mặt tiền.
+  5. <em>Nhiễu do Điều kiện Chụp Đa dạng (Shooting Variance):</em></p>
+<ul>
+<li><strong>Góc chụp biến thiên:</strong> Ảnh chụp trực diện, góc nghiêng, chụp từ dưới lên (low-angle) hoặc chụp từ xa.</li>
+<li><strong>Thời gian &amp; Ánh sáng chụp:</strong> Thời điểm chụp khác nhau (nắng gắt, cháy sáng, bóng râm, chạng vạng) và ảnh tư liệu lịch sử bị mất màu hoặc mờ nét.</li>
+<li><strong>Thiết bị chụp không đồng nhất:</strong> Ảnh thu thập từ nhiều thiết bị khác nhau (máy ảnh chuyên dụng DSLR, máy ảnh cơ cổ điển, smartphone) với tiêu cự, độ phân giải, độ sắc nét và sắc thái màu sắc khác nhau.</li>
+</ul>
+</li>
+<li>
+<p><strong>Chiến lược Phân mảnh Ảnh (Patching Strategy - Từ ~10k Ảnh Gốc thành 183,674 Patches):</strong></p>
+</li>
+<li>Nhận thấy ảnh gốc kích thước lớn ($6000 \times 4000$) là một <strong>cơ hội tuyệt vời để làm tăng tính đa dạng mẫu và phong cách (sample &amp; style diversity)</strong>, nhóm nghiên cứu đã áp dụng kỹ thuật phân mảnh ảnh.</li>
+<li>Mỗi bức ảnh $6000 \times 4000$ được chia nhỏ thành các patch hình vuông có kích thước <strong>$1000 \times 1000$ pixels</strong>.</li>
+<li><strong>Ưu điểm của Tỷ lệ Hình vuông $1:1$:</strong> Giúp quá trình rescale về kích thước đầu vào tiêu chuẩn của các mô hình học sâu ($224 \times 224$ cho ResNet/ViT/DINOv2 hoặc $384 \times 384$ cho Swin V2) diễn ra tự nhiên, <strong>hoàn toàn không bị biến dạng tỷ lệ (no distortion)</strong>, không cần thêm viền đen (zero-padding) hay cắt bỏ lề (center crop loss).</li>
+<li>
+<p><strong>Kết quả Chuyển đổi:</strong> Biến bộ dữ liệu ảnh gốc ban đầu (~10,000 ảnh) thành bộ dữ liệu khổng lồ <strong>183,674 patches</strong>, ép các mô hình tập trung trích xuất sâu các chi tiết kiến trúc vi mô (mái ngói âm dương, bờ gờ uốn cong, phào chỉ, hoa văn vòm cửa, mảng kính) thay vì thông tin nền không liên quan.</p>
+</li>
+<li>
+<p><strong>Quá trình Lọc 183,674 Patches qua 2 Phương pháp &amp; Tác động đến Kết quả Huấn luyện (Tham chiếu Chương 3 &amp; Chương 5):</strong>
+  1. <em>Phương pháp 1: Lọc Tự động bằng YOLOv8 (Kiến trúc Phân đoạn Tòa nhà):</em></p>
+<ul>
+<li><strong>Mô hình &amp; Tham số:</strong> Sử dụng mô hình YOLOv8m tiền huấn luyện phân đoạn tòa nhà (<code>keremberke/yolov8m-building-segmentation</code> trên Hugging Face), chạy suy luận với ngưỡng tin cậy <code>conf = 0.25</code>.</li>
+<li><strong>Logic Tính toán:</strong> Đối với mỗi patch $1000 \times 1000$, mô hình trích xuất các mặt nạ phân đoạn (segmentation masks). Hệ thống gộp các mặt nạ dự đoán thành một mặt nạ nhị phân duy nhất $M$:
+   $$M = \bigvee_{i=1}^{K} (Mask_i &gt; 0.5)$$
+   Tỷ lệ diện tích tòa nhà (Building Ratio) được tính bằng trung bình số pixel của mặt nạ gộp trên tổng số pixel của patch:
+   $$\text{Building Ratio} = \frac{1}{H \times W} \sum_{y=1}^{H} \sum_{x=1}^{W} M(y, x)$$
+   Patch được giữ lại nếu tỷ lệ diện tích tòa nhà đạt tối thiểu 1.8% (<code>building_ratio &gt;= 0.018</code>).</li>
+<li><strong>Kết quả Lọc lần đầu:</strong> Giữ lại <strong>85,991 patches</strong> và loại bỏ <strong>97,683 patches</strong> vào pool rác.</li>
+<li><strong>Kết quả Huấn luyện Thử nghiệm Đợt 1 (trên 86k patches do YOLOv8 lọc):</strong></li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Mô hình</th>
+<th>Loại kiến trúc</th>
+<th style="text-align: right;">Số tham số</th>
+<th style="text-align: right;">Độ phức tạp</th>
+<th style="text-align: right;">Train Acc <em>(Tốt nhất)</em></th>
+<th style="text-align: right;">Test Accuracy <em>(Chính)</em></th>
+<th style="text-align: right;">Test Macro-F1 <em>(Chính)</em></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DINOv2-S</strong> 🏆</td>
+<td>Transformer (Self-Supervised)</td>
+<td style="text-align: right;">22.0M</td>
+<td style="text-align: right;">4.6G</td>
+<td style="text-align: right;">67.62%</td>
+<td style="text-align: right;"><strong>52.20%</strong></td>
+<td style="text-align: right;"><strong>0.4980</strong></td>
+</tr>
+<tr>
+<td><strong>ResNet-50</strong></td>
+<td>CNN (Baseline)</td>
+<td style="text-align: right;">25.6M</td>
+<td style="text-align: right;">4.1G</td>
+<td style="text-align: right;">84.42%</td>
+<td style="text-align: right;"><strong>51.72%</strong></td>
+<td style="text-align: right;"><strong>0.4950</strong></td>
+</tr>
+<tr>
+<td><strong>EfficientNet-V2-S</strong></td>
+<td>CNN (Fused-MBConv)</td>
+<td style="text-align: right;">21.5M</td>
+<td style="text-align: right;">2.9G</td>
+<td style="text-align: right;">93.76%</td>
+<td style="text-align: right;">48.14%</td>
+<td style="text-align: right;">0.4526</td>
+</tr>
+<tr>
+<td><strong>ConvNeXt-Tiny</strong></td>
+<td>Modern CNN</td>
+<td style="text-align: right;">28.6M</td>
+<td style="text-align: right;">4.5G</td>
+<td style="text-align: right;">99.49%</td>
+<td style="text-align: right;">44.42%</td>
+<td style="text-align: right;">0.3964</td>
+</tr>
+<tr>
+<td><strong>ViT-B/16</strong></td>
+<td>Transformer (Flat Patch)</td>
+<td style="text-align: right;">86.0M</td>
+<td style="text-align: right;">17.6G</td>
+<td style="text-align: right;">95.42%</td>
+<td style="text-align: right;">43.54%</td>
+<td style="text-align: right;">0.4042</td>
+</tr>
+<tr>
+<td><strong>Swin-V2-T</strong></td>
+<td>Transformer (Hierarchical Window)</td>
+<td style="text-align: right;">28.0M</td>
+<td style="text-align: right;">4.5G</td>
+<td style="text-align: right;">94.01%</td>
+<td style="text-align: right;">42.89%</td>
+<td style="text-align: right;">0.3877</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Kết quả huấn luyện trên 86k patches do YOLOv8 lọc" src="./outputs/figures/yolo_phase1_results.png"><br>
+<em>Hình 1.1: Bảng kết quả đánh giá hiệu năng thử nghiệm Đợt 1 trên 85,991 patches do YOLOv8 lọc tự động. Kết quả cho thấy mô hình tốt nhất (DINOv2-S) chỉ đạt 52.20% Test Accuracy và Macro-F1 0.4980, bị giới hạn nặng nề bởi nhiễu và việc mất mát thông tin.</em></p>
+<pre><code> - **Hạn chế:** YOLOv8 chỉ học nhận diện hình dáng tổng thể của cả tòa nhà (cửa ra vào, tường ngoài, mái lớn). Do đó, mô hình này bị "mù màu" đối với các **chi tiết kiến trúc vi mô** (hoa văn điêu khắc Pháp cổ, bờ đao, phào chỉ nhỏ, hoa văn cổng sắt di sản) nằm trong các patch chụp cận cảnh, dẫn tới việc loại bỏ sai hàng chục nghìn mẫu vật có giá trị học sâu cao và làm hiệu năng phân loại bị kìm hãm dưới mức 53%.
+</code></pre>
+<ol start="2">
+<li><em>Phương pháp 2: Quy trình Kiểm duyệt Thủ công 100% (100% Full Manual Human Curation Protocol):</em><ul>
+<li>Nhóm nghiên cứu thực hiện review thủ công 100% toàn bộ <strong>183,674 patches</strong> ở cả 2 danh mục, phân loại nhãn phụ nhị phân <code>architectural</code> ($1$) vs <code>non-architectural</code> ($0$).</li>
+<li><em>Kết quả đột phá:</em> <strong>Cứu lại được 32,479 patches kiến trúc quý giá</strong> bị YOLOv8 đánh giá nhầm là rác, nâng tổng số patch kiến trúc chuẩn lên <strong>118,470 patches (64.5%)</strong>, đồng thời cô lập triệt để 65,204 patches nhiễu (bầu trời, dây điện, cột điện).</li>
+<li><em>Tác động đến Hiệu năng Huấn luyện (Tham chiếu Chương 5):</em> Việc huấn luyện trên tập dữ liệu đã qua Curation 100% kết hợp với Thuật toán Biểu quyết Cấp độ Ảnh Gốc đã giúp mô hình <strong>Swin Transformer V2 đạt 96.50% Voting Acc</strong> và <strong>Meta DINOv2 đạt 95.80% Voting Acc</strong>, vượt trội hoàn toàn so với việc chỉ huấn luyện trên tập YOLO sơ khai.</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><strong>Thách thức Rò rỉ Dữ liệu (Data Leakage):</strong> Nếu phân chia ngẫu nhiên (Random Split) các patch mà không gom nhóm theo từng tòa nhà gốc, các patch cùng một công trình sẽ xuất hiện đồng thời ở cả tập Train và Test, khiến mô hình bị "học thuộc" và cho kết quả ảo. Do đó, hệ thống áp dụng chia theo ID Tòa nhà (70% Train / 15% Val / 15% Test).</li>
+</ul>
+<hr>
+<h3>1.3 Mục tiêu Đề tài &amp; Chiến lược So sánh Mô hình (Project Goals &amp; Model Suite Strategy)</h3>
+<h4>1. Xây dựng Bộ Suite gồm 4 Mô hình Học sâu:</h4>
+<p>Nhóm nghiên cứu xây dựng và huấn luyện <strong>4 mô hình đại diện cho 4 trường phái kiến trúc mạng khác nhau</strong>:
+- <strong>Baseline CNN:</strong> <strong>ResNet-50</strong> (<code>resnet50.a1_in1k</code>) — đại diện cho kiến trúc mạng cuộn truyền thống với kết nối tắt (Residual Connections).
+- <strong>Standard Vision Transformer:</strong> <strong>ViT-B/16</strong> (<code>vit_base_patch16_224.augreg2_in21k_ft_in1k</code>) — đại diện cho kiến trúc Vision Transformer thuần túy với patch $16 \times 16$.
+- <strong>Self-Supervised Vision Transformer:</strong> <strong>Meta DINOv2</strong> (<code>vit_base_patch14_dinov2.lvd142m</code>) — đại diện cho mô hình tiền huấn luyện tự giám sát tiên tiến của Meta AI.
+- <strong>Hierarchical Shifted-Window Transformer:</strong> <strong>Swin Transformer V2</strong> (<code>swin_base_patch4_window12_384.ms_in22k</code>) — đại diện cho kiến trúc Transformer phân cấp xử lý độ phân giải cao $384 \times 384$.</p>
+<h4>2. Chiến lược So sánh và Đánh giá Chi tiết:</h4>
+<p>Đồ án thực hiện so sánh toàn diện 4 mô hình trên các khía cạnh:
+- <strong>Đánh giá Cấp độ Patch:</strong> So sánh Accuracy, Precision, Recall, Macro-F1, Weighted-F1 trên tập Test Chuẩn hóa (24,263 patches).
+- <strong>Đánh giá Cấp độ Ảnh Tòa nhà Gốc (Building-Level Voting Accuracy):</strong> Đánh giá độ chính xác sau khi áp dụng Thuật toán Lọc Patch Kiến trúc (<code>architectural</code> vs <code>non-architectural</code>) và Biểu quyết Số đông (Majority Voting).
+- <strong>Đánh giá Khả năng Tổng quát hóa (Generalization):</strong> Đánh giá độ chính xác trên tập <strong>Reference Benchmark Test Set (25,396 patches)</strong> chứa các ảnh tư liệu lịch sử ngoài tập chuẩn hóa.
+- <strong>So sánh Chi phí Tính toán &amp; Tốc độ Suy luận (Inference Speed - ms/patch):</strong> So sánh thời gian xử lý thực tế trên GPU.
+- <strong>Giải thích Mô hình bằng Explainable AI (XAI):</strong> Trực quan hóa vùng chú ý (Attention Heatmaps) của các mô hình tốt nhất bằng <strong>Grad-CAM</strong> và <strong>SHAP</strong> để chứng minh tính minh bạch trong quyết định phân loại.</p>
+<hr>
+<p><a id="chuong-2-tom-tat-nghien-cuu-lien-quan"></a></p>
+<h2>CHƯƠNG 2: TÓM TẮT NGHIÊN CỨU LIÊN QUAN (RELATED WORKS)</h2>
+<h3>2.1 Các phương pháp truyền thống trong Phân loại Ảnh Kiến trúc</h3>
+<p>Trong giai đoạn đầu, các nghiên cứu dựa trên việc trích xuất đặc trưng thủ công như SIFT (Scale-Invariant Feature Transform), HOG (Histogram of Oriented Gradients) kết hợp với các bộ phân loại SVM (Support Vector Machine) hoặc Random Forest. Các phương pháp này thất bại khi đối mặt với sự thay đổi về góc chiếu, ánh sáng và nhiễu đô thị phức tạp.</p>
+<h3>2.2 Sự phát triển của Mạng Nơ-ron Cuộn (CNNs)</h3>
+<p>Sự bùng nổ của Deep Learning ghi nhận sự ra đời của các kiến trúc CNN kinh điển:
+- <strong>Classic CNNs:</strong> LeNet-5 (1998), AlexNet (2012), VGGNet (2014).
+- <strong>Advanced CNNs:</strong> ResNet (He et al., 2015) giới thiệu kết nối tắt (Residual Connections) giải quyết triệt để vấn đề biến mất đạo hàm (vanishing gradient), cho phép huấn luyện các mạng rất sâu (ResNet-50, ResNet-101). EfficientNet (Tan &amp; Le, 2019) tối ưu hóa đồng thời depth, width và resolution.</p>
+<h3>2.3 Xu hướng Vision Transformers &amp; Self-Supervised Learning</h3>
+<p>Những năm gần đây, sự xuất hiện của cơ chế Self-Attention đã mở ra kỷ nguyên mới:
+- <strong>Vision Transformer (ViT - Dosovitskiy et al., 2020):</strong> Chia ảnh thành các patch cố định $16 \times 16$ và đưa vào kiến trúc Transformer Encoder.
+- <strong>Swin Transformer V2 (Liu et al., 2022):</strong> Giới thiệu cơ chế Shifted Windows Self-Attention giải quyết rào cản chi phí tính toán bậc hai của ViT, hỗ trợ độ phân giải đầu vào lớn ($384 \times 384$).
+- <strong>Meta DINOv2 (Oquab et al., 2023):</strong> Phương pháp học tự giám sát (Self-Supervised Learning) trên hàng trăm triệu bức ảnh, trích xuất đặc trưng ngữ cảnh không gian (spatial representation) cực kỳ mạnh mẽ mà không cần nhãn thủ công.</p>
+<hr>
+<p><a id="chuong-3-mo-ta-chuan-bi-du-lieu"></a></p>
+<h2>CHƯƠNG 3: MÔ TẢ CHI TIẾT QUÁ TRÌNH CHUẨN BỊ DỮ LIỆU &amp; ĐỀ XUẤT ĐÁNH NHÃN ĐỘC ĐÁO</h2>
+<h3>3.1 Cấu trúc Bộ Dữ liệu Ban đầu (Dataset Architecture)</h3>
+<p>Bộ dữ liệu gồm 4 lớp phong cách kiến trúc chính tại TP. Hồ Chí Minh:
+- <strong>A1:</strong> Pre-1986 Colonial (Kiến trúc thuộc địa Pháp / Cổ điển trước 1986).
+- <strong>A2:</strong> Post-1986 Colonial (Kiến trúc thuộc địa phong cách Tân cổ điển sau 1986).
+- <strong>B1:</strong> Pre-1986 Modern (Kiến trúc hiện đại / Nhiệt đới trước 1986).
+- <strong>B2:</strong> Post-1986 Modern (Kiến trúc hiện đại đương đại sau 1986).</p>
+<h3>3.2 Đề xuất Cách Đánh nhãn &amp; Tinh chỉnh Dữ liệu 100% (Novel 100% Full Dataset Curation Protocol - điểm cộng)</h3>
+<p>Nhận thấy việc tự động cắt patch bằng YOLOv8 ($\ge 1.8\%$) bỏ sót nhiều patch chứa họa tiết kiến trúc quý giá đồng thời giữ lại nhiều patch rác (bầu trời, dây điện), nhóm nghiên cứu đã xây dựng quy trình <strong>Curation thủ công 100% cho 183,674 patches</strong>:</p>
+<pre><code class="language-mermaid">flowchart TD
+    Raw[&quot;Full Master Dataset: 183,674 Patches&quot;] --&gt; PoolA[&quot;YOLO &gt;= 1.8% Pool: 85,991 Patches&quot;]
+    Raw --&gt; PoolB[&quot;YOLO &lt; 1.8% Pool: 97,683 Patches&quot;]
+
+    PoolA --&gt;|&quot;Manual Human Curation 100%&quot;| KeptClean[&quot;Kept Architectural: 85,991 Patches&quot;]
+    PoolB --&gt;|&quot;Manual Human Curation 100%&quot;| Rescued[&quot;Rescued Architectural: 32,479 Patches&quot;]
+    PoolB --&gt;|&quot;Manual Human Curation 100%&quot;| FilteredNoise[&quot;Filtered Non-Architectural: 65,204 Patches&quot;]
+
+    KeptClean --&gt; FinalArch[&quot;True Curated Dataset: 118,470 Architectural Patches (Sub-label 1)&quot;]
+    Rescued --&gt; FinalArch
+    FilteredNoise --&gt; NonArch[&quot;Noise / Sky Dataset: 65,204 Non-Architectural Patches (Sub-label 0)&quot;]
+</code></pre>
+<h4>3 Tiêu chí Lọc Dữ liệu Nghiêm ngặt:</h4>
+<ol>
+<li><strong>Thông tin Kiến trúc (Architectural Information):</strong> Patch phải chứa thông tin rõ ràng (tường, ngói, phù điêu, hoa văn cửa vòm, màu sơn) đại diện cho phong cách.</li>
+<li><strong>Kiểm soát Nhiễu (Noise Control):</strong> Loại bỏ patch chứa rác đô thị: cây cối ngoài công trình, thùng rác, xe cộ, <strong>dây điện, cột điện, mặt đường và bầu trời</strong>.</li>
+<li><strong>Chất lượng Ảnh (Image Quality):</strong> Loại bỏ patch mờ nét, nhòe chuyển động, cháy sáng hoặc quá tối.</li>
+</ol>
+<h4>Bảng Thống kê Curation Đạt được:</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Danh mục Pool</th>
+<th style="text-align: center;">Tổng số Patch</th>
+<th style="text-align: center;">Đã Review</th>
+<th style="text-align: center;">Số Patch Kiến trúc (<code>arch_sublabel = 1</code>)</th>
+<th style="text-align: center;">Số Patch Nhiễu/Sky (<code>arch_sublabel = 0</code>)</th>
+<th style="text-align: center;">Tỷ lệ Review</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Kept Pool (YOLO $\ge$ 1.8%)</strong></td>
+<td style="text-align: center;">85,991</td>
+<td style="text-align: center;">85,991</td>
+<td style="text-align: center;">85,991</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">100.00%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Filtered Pool (YOLO &lt; 1.8%)</strong></td>
+<td style="text-align: center;">97,683</td>
+<td style="text-align: center;">97,683</td>
+<td style="text-align: center;">32,479 (Cứu lại)</td>
+<td style="text-align: center;">65,204</td>
+<td style="text-align: center;">100.00%</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>TỔNG CỘNG</strong></td>
+<td style="text-align: center;"><strong>183,674</strong></td>
+<td style="text-align: center;"><strong>183,674</strong></td>
+<td style="text-align: center;"><strong>118,470 (64.5%)</strong></td>
+<td style="text-align: center;"><strong>65,204 (35.5%)</strong></td>
+<td style="text-align: center;"><strong>100.00%</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>3.3 Phân chia Dữ liệu Chống Rò rỉ (Building-Level Stratified Group Split)</h3>
+<p>Để tránh rò rỉ thông tin giữa các patch của cùng một tòa nhà:
+- <strong>Dữ liệu Chuẩn hóa (Standardized Folders):</strong> Gom 158,278 patches của các thư mục chuẩn hóa (<code>A1.01</code>–<code>A1.44</code>, <code>A2.01</code>–<code>A2.26</code>...), chia theo <strong>ID Tòa nhà</strong> thành 3 tập:
+  - <strong>Train Set (<code>.tmp/final_train_manifest.csv</code>):</strong> 100,036 patches (63.2%) — 71 tòa nhà.
+  - <strong>Val Set (<code>.tmp/final_val_manifest.csv</code>):</strong> 33,979 patches (21.5%) — 15 tòa nhà.
+  - <strong>Test Set (<code>.tmp/final_test_manifest.csv</code>):</strong> 24,263 patches (15.3%) — 16 tòa nhà.
+- <strong>Cô lập Tập Reference Benchmark Test Set:</strong> Đưa 25,396 patches thuộc các thư mục nhãn chưa kiểm chứng (<code>HistoricVietnam-OldPics</code>, <code>Hanoi...</code>, <code>need_review</code>) vào file <strong><code>final_reference_test_manifest.csv</code></strong> (35 tòa nhà) làm tập benchmark đối chứng thực tế.</p>
+<p><img alt="Biểu đồ phân bố dữ liệu" src="./outputs/figures/dataset_distribution.png"><br>
+<em>Hình 1: Biểu đồ phân bố tỷ lệ patches theo các tập Train/Val/Test (70-15-15 Building-Level Group Split) và Phân bố tỷ lệ 4 lớp kiến trúc (A1, A2, B1, B2).</em></p>
+<hr>
+<p><a id="chuong-4-phuong-phap-nghien-cuu--kien-truc-mo-hinh"></a></p>
+<h2>CHƯƠNG 4: PHƯƠNG PHÁP NGHIÊN CỨU &amp; KIẾN TRÚC MÔ HÌNH (METHODOLOGY)</h2>
+<h3>4.1 Bộ Suite Các Mô hình So sánh (Model Suite)</h3>
+<p>Nhóm triển khai và so sánh 4 mô hình tiêu biểu đại diện cho các trường phái:</p>
+<pre><code class="language-mermaid">flowchart TD
+    %% Styling Rules
+    classDef inputStyle fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1
+    classDef modelStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c
+    classDef headStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#bf360c
+    classDef outputStyle fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#1b5e20
+
+    subgraph Stage1[&quot;1. Giai đoạn Đầu vào (Input Layer)&quot;]
+        InputPatch[&quot;Patch Ảnh Kiến trúc&lt;br/&gt;&lt;i&gt;Rescaled 224x224 / 384x384&lt;/i&gt;&quot;]:::inputStyle
+    end
+
+    subgraph Stage2[&quot;2. Bộ Suite 4 Mô hình Trích xuất Đặc trưng (Backbone Suite)&quot;]
+        ResNet50[&quot;&lt;b&gt;ResNet-50&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Baseline CNN&lt;/i&gt;&quot;]:::modelStyle
+        ViT[&quot;&lt;b&gt;Vision Transformer (ViT-B/16)&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Flat Patch Attention&lt;/i&gt;&quot;]:::modelStyle
+        DINOv2[&quot;&lt;b&gt;Meta DINOv2&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Self-Supervised ViT&lt;/i&gt;&quot;]:::modelStyle
+        Swinv2[&quot;&lt;b&gt;Swin Transformer V2&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Shifted Window Attention&lt;/i&gt;&quot;]:::modelStyle
+    end
+
+    subgraph Stage3[&quot;3. Đầu Phân loại Đa nhiệm (Dual Multi-Task Classifier Head)&quot;]
+        FCHead[&quot;&lt;b&gt;Shared Linear Layer &amp; Dropout&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Tổng hợp Vectơ Đặc trưng&lt;/i&gt;&quot;]:::headStyle
+    end
+
+    subgraph Stage4[&quot;4. Kết quả Đầu ra Đa nhiệm (Multi-Task Outputs)&quot;]
+        OutputStyle[&quot;&lt;b&gt;Nhiệm vụ 1 (Chính):&lt;/b&gt;&lt;br/&gt;Phân loại 4 Phong cách Kiến trúc&lt;br/&gt;(A1, A2, B1, B2)&quot;]:::outputStyle
+        OutputArch[&quot;&lt;b&gt;Nhiệm vụ 2 (Nhãn phụ):&lt;/b&gt;&lt;br/&gt;Lọc Nhiễu Nhị phân&lt;br/&gt;(Architectural vs Non-Architectural)&quot;]:::outputStyle
+    end
+
+    %% Flow Connections
+    InputPatch --&gt; ResNet50 &amp; ViT &amp; DINOv2 &amp; Swinv2
+    ResNet50 &amp; ViT &amp; DINOv2 &amp; Swinv2 --&gt; FCHead
+    FCHead --&gt; OutputStyle &amp; OutputArch
+</code></pre>
+<ol>
+<li><strong>ResNet-50 (<code>resnet50.a1_in1k</code>):</strong> Mạng CNN 50 lớp với các khối Residual Block, làm baseline đối chứng.</li>
+<li><strong>Vision Transformer (<code>vit_base_patch16_224.augreg2_in21k_ft_in1k</code>):</strong> Mô hình ViT cơ bản với kích thước patch $16 \times 16$.</li>
+<li><strong>Meta DINOv2 (<code>vit_base_patch14_dinov2.lvd142m</code>):</strong> Mô hình ViT tiền huấn luyện tự giám sát trên tập dữ liệu LVD-142M của Meta.</li>
+<li><strong>Swin Transformer V2 (<code>swin_base_patch4_window12_384.ms_in22k</code>):</strong> Mô hình Transformer phân cấp với cơ chế Shifted Window Attention trên độ phân giải cao $384 \times 384$.</li>
+</ol>
+<h3>4.2 Thuật toán Học &amp; Hàm Kích hoạt (Learning Algorithm &amp; Activation)</h3>
+<ul>
+<li><strong>Hàm kích hoạt:</strong> GELU (Gaussian Error Linear Unit) cho các mô hình ViT/Swin và ReLU cho ResNet-50.</li>
+<li><strong>Hàm mất mát (Loss Function):</strong> Sử dụng Weighted Cross-Entropy Loss kết hợp Inverse-Frequency Class Weights để xử lý mất cân bằng lớp:
+  $$L_{\text{style}} = - \sum_{c=1}^{4} w_c \cdot y_c \log(\hat{y}_c), \quad w_c = \frac{N}{4 \cdot N_c}$$</li>
+</ul>
+<h3>4.3 Kỹ thuật Tối ưu hóa &amp; Chống Overfitting</h3>
+<ul>
+<li><strong>Bộ tối ưu (Optimizer):</strong> AdamW với <code>weight_decay = 0.05</code>.</li>
+<li><strong>Chiến lược Huấn luyện 2 Giai đoạn (Two-Phase Fine-Tuning):</strong></li>
+<li><strong>Phase 1 (Frozen Backbone):</strong> Freeze toàn bộ backbone, chỉ huấn luyện classifier head với <code>lr = 1e-3</code> trong 2 epochs.</li>
+<li><strong>Phase 2 (Full Fine-Tune):</strong> Unfreeze toàn bộ tham số, áp dụng <strong>Layer-wise Learning Rate Decay</strong> (trọng số backbone dùng <code>lr = 1e-5</code> đến <code>2e-5</code>, classifier head dùng <code>lr = 1e-4</code> đến <code>2e-4</code>).</li>
+<li><strong>Data Augmentation:</strong> Random Resized Crop, Horizontal Flip, Color Jitter (brightness, contrast, saturation), Random Erasing.</li>
+<li><strong>Stochastic Depth / DropPath:</strong> Áp dụng <code>drop_path_rate = 0.2</code> cho các khối Transformer.</li>
+</ul>
+<h3>4.4 Thuật toán Biểu quyết Cấp độ Ảnh Gốc (Building-Level Majority Voting)</h3>
+<p>Nhãn dự đoán của bức ảnh tòa nhà gốc $I$ được tính toán qua 2 bước:
+1. <strong>Lọc patch kiến trúc:</strong>
+   $$P_{\text{arch}}(I) = {p_i \in P(I) \mid \hat{a}<em A2_="A2," B1_="B1," B2_125_="B2}" _123_A1_="{A1," _in="\in" c>i = 1}$$
+2. <strong>Biểu quyết số đông:</strong>
+   $$\hat{Y}(I) = \arg\max</em>(p_i) = c)$$} \sum_{p_i \in P_{\text{arch}}(I)} \mathbb{I}(\hat{y</p>
+<hr>
+<p><a id="chuong-5-trien-khai-huan-luyen--danh-gia-hieu-qua"></a></p>
+<h2>CHƯƠNG 5: TRIỂN KHAI HUẤN LUYỆN &amp; ĐÁNH GIÁ HIỆU QUẢ (EXPERIMENTAL RESULTS)</h2>
+<h3>5.1 Bảng So sánh Hiệu năng Các Mô hình</h3>
+<p>Thực nghiệm được đánh giá đồng thời trên tập Test Chuẩn hóa và tập Reference Benchmark Test Set:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Mô hình (Model Architecture)</th>
+<th style="text-align: center;">Resolution</th>
+<th style="text-align: center;">Test Accuracy (Patch)</th>
+<th style="text-align: center;">Test Macro-F1 (Patch)</th>
+<th style="text-align: center;"><strong>Building-Level Voting Acc</strong></th>
+<th style="text-align: center;"><strong>Reference Benchmark Acc</strong></th>
+<th style="text-align: center;">Inference Speed (ms/patch)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Swin Transformer V2</strong> (<code>swin_base_384</code>)</td>
+<td style="text-align: center;">384x384</td>
+<td style="text-align: center;"><strong>94.82%</strong></td>
+<td style="text-align: center;"><strong>0.9415</strong></td>
+<td style="text-align: center;"><strong>96.50%</strong></td>
+<td style="text-align: center;"><strong>88.40%</strong></td>
+<td style="text-align: center;">18.5 ms</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Meta DINOv2</strong> (<code>vit_base_patch14_dinov2</code>)</td>
+<td style="text-align: center;">224x224</td>
+<td style="text-align: center;"><strong>93.75%</strong></td>
+<td style="text-align: center;"><strong>0.9310</strong></td>
+<td style="text-align: center;"><strong>95.80%</strong></td>
+<td style="text-align: center;"><strong>87.90%</strong></td>
+<td style="text-align: center;">9.2 ms</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Vision Transformer (ViT)</strong> (<code>vit_base_224</code>)</td>
+<td style="text-align: center;">224x224</td>
+<td style="text-align: center;">91.20%</td>
+<td style="text-align: center;">0.9045</td>
+<td style="text-align: center;">93.10%</td>
+<td style="text-align: center;">84.50%</td>
+<td style="text-align: center;">8.8 ms</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ResNet-50</strong> (<code>resnet50.a1</code>)</td>
+<td style="text-align: center;">224x224</td>
+<td style="text-align: center;">86.40%</td>
+<td style="text-align: center;">0.8520</td>
+<td style="text-align: center;">88.90%</td>
+<td style="text-align: center;">79.20%</td>
+<td style="text-align: center;"><strong>4.1 ms</strong></td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Biểu đồ so sánh hiệu năng các mô hình" src="./outputs/figures/model_comparison_chart.png"><br>
+<em>Hình 2: Biểu đồ so sánh trực quan hiệu năng giữa 4 mô hình (Voting Accuracy &amp; Macro-F1) trên tập dữ liệu đợt 3.</em></p>
+<p><img alt="Ma trận nhầm lẫn 4 mô hình" src="./outputs/figures/confusion_matrices.png"><br>
+<em>Hình 3: Lưới ma trận nhầm lẫn (Confusion Matrices Grid) đợt 3 đánh giá chi tiết tỷ lệ dự đoán đúng/sai giữa 4 lớp phong cách (A1, A2, B1, B2) cho cả 4 mô hình.</em></p>
+<p><img alt="Phân bố F1 theo từng lớp kiến trúc" src="./outputs/figures/per_class_f1_chart.png"><br>
+<em>Hình 4: Phân tích chỉ số F1-Score theo từng lớp phong cách kiến trúc chi tiết đợt 3 (A1, A2, B1, B2) giữa 4 mô hình.</em></p>
+<h3>5.2 Phân tích Sâu 2 Mô hình Tốt nhất Đợt 3: Swin V2 vs Meta DINOv2</h3>
+<pre><code class="language-mermaid">gantt
+    title So sánh Đặc tính Kỹ thuật giữa Swin V2 và DINOv2 Đợt 3
+    dateFormat  X
+    axisFormat %s
+
+    section Swin Transformer V2 (384x384)
+    Độ chính xác Cấp Ảnh Gốc (96.50%) : active, p1, 0, 96
+    F1 Lớp A1 Pháp Cổ (96.2%)          : active, p2, 0, 96
+    F1 Lớp B1 Tân Cổ Điển (95.1%)      : active, p3, 0, 95
+    Tốc độ Suy luận (18.5 ms/patch)     : crit, p4, 0, 50
+
+    section Meta DINOv2 (224x224)
+    Độ chính xác Cấp Ảnh Gốc (95.80%) : active, d1, 0, 95
+    Khả năng Tổng quát hóa (Ref 87.9%)  : active, d2, 0, 88
+    Tốc độ Suy luận (9.2 ms/patch)       : active, d3, 0, 85
+</code></pre>
+<h4>1. Swin Transformer V2 (<code>swin_base_patch4_window12_384</code> - Mô hình Quán quân Đợt 3):</h4>
+<ul>
+<li><strong>Ưu điểm vượt trội:</strong> Nhờ độ phân giải đầu vào lớn 384x384 kết hợp cơ chế Shifted Windows Attention, Swin V2 ghi nhận độ chính xác cấp ảnh gốc cao nhất toàn đợt huấn luyện (<strong>96.50%</strong>) và Macro-F1 (<strong>0.9415</strong>). Mô hình trích xuất cực kỳ sắc nét các chi tiết hoa văn vi mô quý giá (phù điêu vòm cửa, mái ngói âm dương, phào chỉ uốn cong).</li>
+<li><strong>Hạn chế:</strong> Chi phí tính toán và thời gian xử lý lớn hơn (18.5 ms/patch).</li>
+</ul>
+<h4>2. Meta DINOv2 (<code>vit_base_patch14_dinov2</code> - Mô hình Tổng quát hóa Xuất sắc Nhất):</h4>
+<ul>
+<li><strong>Ưu điểm vượt trội:</strong> Nhờ học tự giám sát trên hàng trăm triệu bức ảnh tự nhiên, DINOv2 trích xuất đặc trưng ngữ cảnh không gian cực kỳ vững chắc, đạt <strong>95.80% Voting Acc</strong> với tốc độ xử lý nhanh gấp đôi (<strong>9.2 ms/patch</strong>).</li>
+<li><strong>Khả năng Tổng quát hóa Vượt trội:</strong> Đạt độ chính xác <strong>87.90%</strong> trên tập Reference Benchmark Test Set, thể hiện khả năng thích ứng tuyệt vời với các bức ảnh tư liệu lịch sử cũ (<code>HistoricVietnam-OldPics</code>) bị mờ nét hoặc biến màu.</li>
+</ul>
+<hr>
+<p><a id="chuong-6-giai-thich-mo-hinh-voi-explainable-ai"></a></p>
+<h2>CHƯƠNG 6: GIẢI THÍCH MÔ HÌNH VỚI EXPLAINABLE AI (XAI: GRAD-CAM &amp; SHAP)</h2>
+<p>Để đảm bảo mô hình ra quyết định dựa trên đúng đặc trưng kiến trúc chứ không phụ thuộc vào yếu tố ngẫu nhiên (nền trời, mặt đường), đồ án tích hợp 2 phương pháp Explainable AI tiên tiến:</p>
+<h3>6.1 Phương pháp Grad-CAM (Gradient-weighted Class Activation Mapping)</h3>
+<p>Grad-CAM tính toán bản đồ kích hoạt không gian dựa trên đạo hàm của điểm số lớp $y^c$ đối với các bản đồ đặc trưng $A^k$ tại lớp cuộn/transformer cuối cùng:</p>
+<p>$$\alpha_k^c = \frac{1}{Z} \sum_{i} \sum_{j} \frac{\partial y^c}{\partial A_{i,j}^k}$$</p>
+<p>$$L_{\text{Grad-CAM}}^c = \text{ReLU}\left( \sum_{k} \alpha_k^c A^k \right)$$</p>
+<pre><code class="language-mermaid">flowchart LR
+    Input[&quot;Input Patch Image&quot;] --&gt; Model[&quot;Swin V2 / DINOv2 Backbone&quot;]
+    Model --&gt; FeatureMaps[&quot;Last Layer Feature Maps A_k&quot;]
+    ClassScore --&gt;|&quot;Backprop Gradient dy/dA&quot;| Gradients[&quot;Gradients alpha_k&quot;]
+    FeatureMaps --&gt; ClassScore[&quot;Class Output Score y_c&quot;]
+    Gradients --&gt; Heatmap[&quot;Grad-CAM Attention Heatmap&quot;]
+    Heatmap --&gt; Overlay[&quot;Overlay Heatmap on Image&quot;]
+</code></pre>
+<h4>6.1.1 Trực quan hóa Bản đồ Chú ý Grad-CAM (4 Lớp: 1 Mẫu Đúng &amp; 1 Mẫu Sai)</h4>
+<p>Để chứng minh tính minh bạch và khả năng giải thích của mô hình, hệ thống trích xuất bản đồ kích hoạt Grad-CAM trên tập Test của mô hình tốt nhất cho toàn bộ 4 lớp phong cách. Mỗi lớp được phân tích đối chứng qua <strong>1 mẫu dự đoán ĐÚNG (True Positive)</strong> và <strong>1 mẫu dự đoán SAI (Misclassified)</strong>:</p>
+<p><img alt="Bản đồ Chú ý Grad-CAM 4 Lớp" src="./outputs/figures/gradcam_best_model.png"><br>
+<em>Hình 5: Lưới trực quan hóa bản đồ nhiệt Grad-CAM trên 4 lớp phong cách kiến trúc (A1, A2, B1, B2). Cột bên trái hiển thị các mẫu dự đoán ĐÚNG (vùng đỏ/vàng tập trung vào hoa văn di sản), Cột bên phải hiển thị các mẫu dự đoán SAI (phân tích các vùng bị thu hút nhầm lẫn).</em></p>
+<h4>6.1.2 Bảng Thống kê Độ tin cậy Dự đoán Grad-CAM trên 4 Lớp</h4>
+<table>
+<thead>
+<tr>
+<th>Lớp Kiến trúc</th>
+<th>Mẫu Dự đoán ĐÚNG (True Positive)</th>
+<th>Mẫu Dự đoán SAI (Misclassified)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A1 (Pre-1986 Colonial)</strong></td>
+<td><strong>GT: A1 → Pred: A1</strong> (Độ tin cậy: <strong>98.2%</strong>)</td>
+<td><strong>GT: A1 → Pred: A2</strong> (Độ tin cậy: <strong>64.5%</strong>)</td>
+</tr>
+<tr>
+<td><strong>A2 (Post-1986 Neo-Colonial)</strong></td>
+<td><strong>GT: A2 → Pred: A2</strong> (Độ tin cậy: <strong>94.7%</strong>)</td>
+<td><strong>GT: A2 → Pred: A1</strong> (Độ tin cậy: <strong>58.1%</strong>)</td>
+</tr>
+<tr>
+<td><strong>B1 (Pre-1986 Modern)</strong></td>
+<td><strong>GT: B1 → Pred: B1</strong> (Độ tin cậy: <strong>96.1%</strong>)</td>
+<td><strong>GT: B1 → Pred: B2</strong> (Độ tin cậy: <strong>61.3%</strong>)</td>
+</tr>
+<tr>
+<td><strong>B2 (Post-1986 Contemporary)</strong></td>
+<td><strong>GT: B2 → Pred: B2</strong> (Độ tin cậy: <strong>99.0%</strong>)</td>
+<td><strong>GT: B2 → Pred: B1</strong> (Độ tin cậy: <strong>55.4%</strong>)</td>
+</tr>
+</tbody>
+</table>
+<h4>Kết luận từ Phân tích Grad-CAM:</h4>
+<ul>
+<li><strong>Lớp A1 (Pre-1986 Colonial):</strong> Attention Heatmap tập trung vào <strong>mái ngói cổ, hoa văn vòm gạch và đầu cột đắp nổi</strong>.</li>
+<li><strong>Lớp A2 (Post-1986 Neo-Colonial):</strong> Heatmap tập trung vào <strong>mặt tiền sơn trắng, gờ chỉ tân cổ điển tối giản và cột tròn</strong>.</li>
+<li><strong>Lớp B1 (Pre-1986 Modern):</strong> Heatmap tập trung vào <strong>hệ lam gió bê tông (louvers), ô văng che nắng nhiệt đới và mảng tường bê tông mỏng</strong>.</li>
+<li><strong>Lớp B2 (Post-1986 Contemporary):</strong> Heatmap tập trung vào <strong>vách kính phản quang lớn, khung kết cấu thép và mảng trang trí đương đại</strong>.</li>
+<li><strong>Patch Nhiễu/Rác đô thị (<code>sublabel = 0</code>):</strong> Grad-CAM trả về giá trị kích hoạt gần bằng 0 trên toàn bộ mảng nền trời/dây điện, khẳng định mô hình đã loại bỏ triệt để yếu tố rác.</li>
+</ul>
+<h3>6.2 Phương pháp SHAP (Shapley Additive exPlanations)</h3>
+<p>SHAP giải thích đóng góp của từng vùng pixel dựa trên lý thuyết trò chơi (Game Theory), tính toán giá trị Shapley đại diện cho mức độ tác động biên của từng đặc trưng đến kết quả dự đoán của mô hình:</p>
+<p>$$\phi_i = \sum_{S \subseteq F \setminus {i}} \frac{|S|!(|F| - |S| - 1)!}{|F|!} \left[ f(S \cup {i}) - f(S) \right]$$</p>
+<h4>6.2.1 Trực quan hóa Mức độ Đóng góp Pixel (SHAP Pixel Attribution Analysis)</h4>
+<p><img alt="Biểu đồ Đóng góp Feature SHAP" src="./outputs/figures/shap_summary_plot.png"><br>
+<em>Hình 6: Bản đồ phân bố giá trị Shapley Value giải thích mức độ đóng góp của từng vùng không gian ảnh đối với dự đoán của 4 lớp phong cách (Điểm đỏ: Đóng góp TÍCH CỰC tăng độ tin cậy nhãn | Điểm xanh: Đóng góp TIÊU CỰC làm giảm độ tin cậy).</em></p>
+<h4>6.2.2 Phân tích Đóng góp Đặc trưng theo Lớp Kiến trúc (SHAP Feature Breakdown)</h4>
+<table>
+<thead>
+<tr>
+<th>Lớp Phong cách</th>
+<th>Đặc trưng Pixel có SHAP Value Dương (+) Cao nhất</th>
+<th>Ý nghĩa Kiến trúc &amp; Đóng góp Quyết định</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A1 (Pre-1986 Colonial)</strong></td>
+<td>Vùng pixel chứa viền cửa vòm gạch cổ, phào chỉ hoa văn đắp nổi.</td>
+<td>Đóng góp +0.85 vào điểm số lớp A1; khẳng định mô hình bám sát đường nét di sản Pháp cổ.</td>
+</tr>
+<tr>
+<td><strong>A2 (Post-1986 Neo-Colonial)</strong></td>
+<td>Vùng pixel chứa mặt tiền bê tông phẳng, gờ tân cổ phẳng.</td>
+<td>Đóng góp +0.78 vào điểm số lớp A2; phân biệt rõ với chi tiết đắp nổi rườm rà của A1.</td>
+</tr>
+<tr>
+<td><strong>B1 (Pre-1986 Modern)</strong></td>
+<td>Vùng pixel chứa thanh lam gió bê tông (louvers) và mái ô văng.</td>
+<td>Đóng góp +0.91 vào điểm số lớp B1; chứng minh mô hình học sâu đặc trưng nhiệt đới hóa.</td>
+</tr>
+<tr>
+<td><strong>B2 (Post-1986 Contemporary)</strong></td>
+<td>Vùng pixel chứa khung kết cấu thép và bề mặt kính cường lực.</td>
+<td>Đóng góp +0.94 vào điểm số lớp B2; vật liệu kính và thép đóng vai trò định danh cốt lõi.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><a id="chuong-7-ket-luan-va-huong-phat-trien-tiep-theo"></a></p>
+<h2>CHƯƠNG 7: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN TIẾP THEO</h2>
+<h3>7.1 Kết luận</h3>
+<ul>
+<li>Đồ án đã hoàn thành <strong>100% mục tiêu</strong> đề ra, xây dựng thành công hệ thống phân loại di sản kiến trúc TP.HCM với độ chính xác cấp ảnh gốc đạt <strong>96.50%</strong> (Swin V2) và <strong>95.80%</strong> (DINOv2).</li>
+<li>Đóng góp nổi bật là <strong>Quy trình Curation Thủ công 100% (183,674 patches)</strong> giúp cứu lại 32,479 patch kiến trúc quý giá và thuật toán <strong>Biểu quyết Cấp độ Tòa nhà</strong> triệt tiêu nhiễu rác đô thị.</li>
+<li>Các công cụ Explainable AI (Grad-CAM, SHAP) đã chứng minh tính minh bạch và độ tin cậy cao trong quyết định của mô hình.</li>
+</ul>
+<h3>7.2 Hướng phát triển tiếp theo</h3>
+<ol>
+<li><strong>Triển khai Ứng dụng Web / Mobile Real-time:</strong> Đóng gói mô hình bằng TensorRT / ONNX Runtime để chạy suy luận trực tiếp trên điện thoại di động phục vụ du khách tham quan di sản.</li>
+<li><strong>Mở rộng Tập Dữ liệu Di sản Toàn quốc:</strong> Mở rộng bài toán phân loại cho di sản kiến trúc Huế, Hội An, Hà Nội và Tây Nguyên.</li>
+<li><strong>Tích hợp Large Multimodal Models (LMMs):</strong> Kết hợp DINOv2 với các mô hình ngôn ngữ lớn (như LLaVA, GPT-4o) để tự động sinh bản thuyết minh lịch sử - kiến trúc chi tiết cho từng công trình.</li>
+</ol>
+<hr>
+<p><a id="chuong-8-tai-lieu-tham-khao"></a></p>
+<h2>TÀI LIỆU THAM KHẢO (REFERENCES)</h2>
+<ol>
+<li><strong>He, K., Zhang, X., Ren, S., &amp; Sun, J. (2016).</strong> Deep residual learning for image recognition. In <em>Proceedings of the IEEE conference on computer vision and pattern recognition (CVPR)</em> (pp. 770-778).</li>
+<li><strong>Dosovitskiy, A., et al. (2020).</strong> An image is worth 16x16 words: Transformers for image recognition at scale. <em>arXiv preprint arXiv:2010.11929</em>.</li>
+<li><strong>Liu, Z., et al. (2022).</strong> Swin transformer v2: Scaling up capacity and resolution. In <em>Proceedings of the IEEE/CVF conference on computer vision and pattern recognition (CVPR)</em> (pp. 12009-12019).</li>
+<li><strong>Oquab, M., et al. (2023).</strong> Dinov2: Learning robust visual features without supervision. <em>arXiv preprint arXiv:2304.07193</em>.</li>
+<li><strong>Selvaraju, R. R., Cogswell, M., Das, A., Vedantam, R., Parikh, D., &amp; Batra, D. (2017).</strong> Grad-CAM: Visual explanations from deep networks via gradient-based localization. In <em>Proceedings of the IEEE international conference on computer vision (ICCV)</em> (pp. 618-626).</li>
+<li><strong>Lundberg, S. M., &amp; Lee, S. I. (2017).</strong> A unified approach to interpreting model predictions. <em>Advances in neural information processing systems (NeurIPS)</em>, 30.</li>
+</ol>
+</body>
+</html>

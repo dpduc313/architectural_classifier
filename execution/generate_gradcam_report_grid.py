@@ -178,7 +178,7 @@ def get_gradcam_for_model(model_name="resnet50"):
         
         ax_corr = axes[row_idx, 0]
         ax_corr.imshow(overlay_correct)
-        ax_corr.set_title(f"Lớp {CLASS_NAMES[cls]}\n✓ DỰ ĐOÁN ĐÚNG: {pred} (Độ tin cậy: {conf*100:.1f}%)\n[Tập trung: {FOCUS_NOTES[cls][0]}]", 
+        ax_corr.set_title(f"Lớp {CLASS_NAMES[cls]}\n✓ DỰ ĐOÁN ĐÚNG: {pred} (Độ tin cậy: {conf*100:.1f}%)", 
                          color='green', fontweight='bold', fontsize=10, pad=8)
         ax_corr.axis('off')
         
@@ -200,7 +200,7 @@ def get_gradcam_for_model(model_name="resnet50"):
         
         ax_wrong = axes[row_idx, 1]
         ax_wrong.imshow(overlay_wrong)
-        ax_wrong.set_title(f"Lớp {CLASS_NAMES[cls]}\n✗ DỰ ĐOÁN SAI: Nhầm {gt} → {pred_w} (Độ tin cậy: {conf_w*100:.1f}%)\n[Nguyên nhân: {FOCUS_NOTES[cls][1]}]", 
+        ax_wrong.set_title(f"Lớp {CLASS_NAMES[cls]}\n✗ DỰ ĐOÁN SAI: Nhầm {gt} → {pred_w} (Độ tin cậy: {conf_w*100:.1f}%)", 
                           color='darkred', fontweight='bold', fontsize=10, pad=8)
         ax_wrong.axis('off')
         
