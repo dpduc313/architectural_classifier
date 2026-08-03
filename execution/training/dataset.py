@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from PIL import Image
+import pandas as pd
 import torch
 from torch.utils.data import Dataset
 from torchvision import transforms
@@ -22,7 +23,7 @@ VIT_STD  = [0.5, 0.5, 0.5]
 # Input resolution per model
 # DINOv2 native is 518 but we cap at 224 (pass img_size=224 to timm)
 MODEL_INPUT_SIZES = {
-    "swinv2":   256,
+    "swinv2":   384,
     "vit":      224,
     "dinov2":   224,
     "resnet50": 224,
@@ -134,7 +135,7 @@ def get_class_weights(dataset: HeritageDataset) -> torch.Tensor:
     Helps with class imbalance.
     """
     counts = torch.zeros(len(CLASSES))
-    for _, label in dataset.samples:
+    for _, label, _ in dataset.samples:
         counts[label] += 1
     weights = 1.0 / counts.clamp(min=1)
     weights = weights / weights.sum() * len(CLASSES)
