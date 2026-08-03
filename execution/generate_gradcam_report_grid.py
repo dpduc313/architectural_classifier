@@ -1,10 +1,12 @@
 """
-execution/generate_gradcam_report_grid.py — Generate high-resolution 4x2 Grad-CAM comparison grid
-(1 Correct + 1 Misclassified for each of the 4 classes: A1, A2, B1, B2) for the Best Model.
+execution/generate_gradcam_report_grid.py — Generate high-resolution Grad-CAM pair panels
+for 1 correct + 1 misclassified sample in each class (A1, A2, B1, B2).
+Each pair panel shows the original image on the left and the Grad-CAM + caption on the right.
 """
 
 import os
 import sys
+import textwrap
 from pathlib import Path
 import cv2
 import numpy as np
@@ -18,8 +20,10 @@ import timm
 PROJECT_ROOT = Path(__file__).parent.parent
 OUTPUT_DIR   = PROJECT_ROOT / "outputs" / "figures"
 GRAD_DIR     = OUTPUT_DIR / "gradcam"
+PAIR_DIR     = OUTPUT_DIR / "gradcam_pairs"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 GRAD_DIR.mkdir(parents=True, exist_ok=True)
+PAIR_DIR.mkdir(parents=True, exist_ok=True)
 
 CLASSES = ["A1", "A2", "B1", "B2"]
 CLASS_NAMES = {
@@ -42,6 +46,47 @@ def generate_heatmap(image_np, cam_map):
     heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB) / 255.0
     overlay = 0.45 * heatmap + 0.55 * image_np
     return np.clip(overlay, 0, 1)
+
+
+def render_pair_panel(original_np, overlay_np, title_lines, output_path, accent_color):
+    """Render a single panel with original image on the left and Grad-CAM + caption on the right."""
+    fig = plt.figure(figsize=(9.4, 4.8), facecolor="white")
+    grid = fig.add_gridspec(
+        2,
+        2,
+        width_ratios=[1.0, 1.08],
+        height_ratios=[0.28, 0.72],
+        wspace=0.02,
+        hspace=0.04,
+    )
+
+    ax_original = fig.add_subplot(grid[:, 0])
+    ax_caption = fig.add_subplot(grid[0, 1])
+    ax_overlay = fig.add_subplot(grid[1, 1])
+
+    ax_original.imshow(original_np)
+    ax_original.axis("off")
+
+    ax_caption.axis("off")
+    caption_text = "\n".join(title_lines)
+    ax_caption.text(
+        0.0,
+        1.0,
+        caption_text,
+        ha="left",
+        va="top",
+        fontsize=10.5,
+        color=accent_color,
+        fontweight="bold",
+        transform=ax_caption.transAxes,
+        wrap=True,
+    )
+
+    ax_overlay.imshow(overlay_np)
+    ax_overlay.axis("off")
+
+    fig.savefig(output_path, dpi=220, bbox_inches="tight", pad_inches=0.04)
+    plt.close(fig)
 
 def load_and_preprocess(img_path, size=224):
     img = Image.open(img_path).convert("RGB").resize((size, size))
@@ -147,9 +192,7 @@ def get_gradcam_for_model(model_name="resnet50"):
         print(f"Using synthetic feature gradient overlay: {e}")
         use_pycam = False
 
-    # Create composite 4x2 figure
-    fig, axes = plt.subplots(4, 2, figsize=(12, 18))
-    plt.suptitle("Bản đồ Chú ý Grad-CAM Mô hình Phân loại Kiến trúc\n(Đánh giá 1 Mẫu Dự đoán Đúng & 1 Mẫu Nhầm lẫn cho mỗi Lớp)", fontsize=16, fontweight='bold', y=0.98)
+    pair_paths = {}
     
     # Class-specific focused feature annotations
     FOCUS_NOTES = {
@@ -175,15 +218,13 @@ def get_gradcam_for_model(model_name="resnet50"):
             grayscale_cam = np.exp(-((d - 0.2)**2 / (2.0 * 0.3**2)))
             
         overlay_correct = generate_heatmap(img_np, grayscale_cam)
-        
-        ax_corr = axes[row_idx, 0]
-        ax_corr.imshow(overlay_correct)
-        ax_corr.set_title(f"Lớp {CLASS_NAMES[cls]}\n✓ DỰ ĐOÁN ĐÚNG: {pred} (Độ tin cậy: {conf*100:.1f}%)", 
-                         color='green', fontweight='bold', fontsize=10, pad=8)
-        ax_corr.axis('off')
-        
-        # Save individual crop
-        cv2.imwrite(str(GRAD_DIR / f"{cls}_correct_gradcam.jpg"), cv2.cvtColor(np.uint8(255 * overlay_correct), cv2.COLOR_RGB2BGR))
+        pair_paths[(cls, "correct")] = PAIR_DIR / f"{cls}_correct_pair.png"
+        correct_lines = [
+            f"Lớp {CLASS_NAMES[cls]}",
+            f"✓ DỰ ĐOÁN ĐÚNG: {pred} (Độ tin cậy: {conf*100:.1f}%)",
+            f"Tập trung: {FOCUS_NOTES[cls][0]}",
+        ]
+        render_pair_panel(img_np, overlay_correct, correct_lines, pair_paths[(cls, "correct")], "green")
         
         # 2. Wrong Sample
         f_w, img_np_w, tensor_w, gt_w, pred_w, conf_w = cls_data["wrong"]
@@ -197,19 +238,33 @@ def get_gradcam_for_model(model_name="resnet50"):
             grayscale_cam_w = np.exp(-(d**2 / (2.0 * 0.25**2)))
             
         overlay_wrong = generate_heatmap(img_np_w, grayscale_cam_w)
-        
-        ax_wrong = axes[row_idx, 1]
-        ax_wrong.imshow(overlay_wrong)
-        ax_wrong.set_title(f"Lớp {CLASS_NAMES[cls]}\n✗ DỰ ĐOÁN SAI: Nhầm {gt} → {pred_w} (Độ tin cậy: {conf_w*100:.1f}%)", 
-                          color='darkred', fontweight='bold', fontsize=10, pad=8)
-        ax_wrong.axis('off')
-        
-        # Save individual crop
-        cv2.imwrite(str(GRAD_DIR / f"{cls}_wrong_gradcam.jpg"), cv2.cvtColor(np.uint8(255 * overlay_wrong), cv2.COLOR_RGB2BGR))
+        pair_paths[(cls, "wrong")] = PAIR_DIR / f"{cls}_wrong_pair.png"
+        wrong_lines = [
+            f"Lớp {CLASS_NAMES[cls]}",
+            f"✗ DỰ ĐOÁN SAI: Nhầm {gt} → {pred_w} (Độ tin cậy: {conf_w*100:.1f}%)",
+            f"Nguyên nhân: {FOCUS_NOTES[cls][1]}",
+        ]
+        render_pair_panel(img_np_w, overlay_wrong, wrong_lines, pair_paths[(cls, "wrong")], "darkred")
 
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    # Create composite grid from the 8 pair panels
+    fig, axes = plt.subplots(4, 2, figsize=(18, 24), facecolor="white")
+    plt.suptitle(
+        "8 Mẫu Grad-CAM Kiến Trúc (1 Mẫu Đúng + 1 Mẫu Sai / Lớp)\n"
+        "Ảnh gốc ở bên trái, Grad-CAM và chú thích ở bên phải",
+        fontsize=16,
+        fontweight='bold',
+        y=0.995,
+    )
+
+    for row_idx, cls in enumerate(CLASSES):
+        for col_idx, kind in enumerate(("correct", "wrong")):
+            ax = axes[row_idx, col_idx]
+            ax.imshow(plt.imread(pair_paths[(cls, kind)]))
+            ax.axis('off')
+
+    plt.tight_layout(rect=[0, 0, 1, 0.975])
     grid_path = OUTPUT_DIR / "gradcam_best_model.png"
-    plt.savefig(grid_path, dpi=200, bbox_inches='tight')
+    plt.savefig(grid_path, dpi=220, bbox_inches='tight')
     plt.close()
     print(f"Saved Grad-CAM composite grid to: {grid_path}")
 

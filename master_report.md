@@ -337,8 +337,8 @@ flowchart LR
 
 Để chứng minh tính minh bạch và khả năng giải thích của mô hình, hệ thống trích xuất bản đồ kích hoạt Grad-CAM trên tập Test của mô hình tốt nhất cho toàn bộ 4 lớp phong cách. Mỗi lớp được phân tích đối chứng qua **1 mẫu dự đoán ĐÚNG (True Positive)** và **1 mẫu dự đoán SAI (Misclassified)**:
 
-![Bản đồ Chú ý Grad-CAM 4 Lớp](./outputs/figures/gradcam_best_model.png)  
-*Hình 5: Lưới trực quan hóa bản đồ nhiệt Grad-CAM trên 4 lớp phong cách kiến trúc (A1, A2, B1, B2). Cột bên trái hiển thị các mẫu dự đoán ĐÚNG (vùng đỏ/vàng tập trung vào hoa văn di sản), Cột bên phải hiển thị các mẫu dự đoán SAI (phân tích các vùng bị thu hút nhầm lẫn).*
+![Bản đồ Chú ý Grad-CAM 8 Mẫu](./outputs/figures/gradcam_best_model.png)  
+*Hình 5: Lưới trực quan hóa 8 mẫu Grad-CAM trên 4 lớp phong cách kiến trúc (A1, A2, B1, B2). Mỗi ô hiển thị ảnh gốc bên trái và Grad-CAM kèm chú thích bên phải, gồm 1 mẫu dự đoán ĐÚNG và 1 mẫu dự đoán SAI cho mỗi lớp.*
 
 #### 6.1.2 Bảng Thống kê Độ tin cậy Dự đoán Grad-CAM trên 4 Lớp
 
