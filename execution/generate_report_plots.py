@@ -127,13 +127,15 @@ def plot_model_comparison():
         if path.exists():
             with open(path, 'r', encoding='utf-8') as f:
                 d = json.load(f)
-                std = d.get("primary_standard", {})
+                std = d.get("standard_test", d.get("primary_standard", {}))
+                acc = std.get("image_voting_accuracy", std.get("patch_accuracy", std.get("accuracy", d.get("test_accuracy", 0.0))))
+                f1 = std.get("patch_macro_f1", std.get("macro_f1", d.get("macro_f1", 0.0)))
                 models_data.append({
                     "model": m,
                     "name": MODEL_NAMES[m],
-                    "std_acc": std.get("accuracy", d["test_accuracy"]),
-                    "std_f1":  std.get("macro_f1", d["macro_f1"]),
-                    "speed":   d["ms_per_image"]
+                    "std_acc": acc,
+                    "std_f1":  f1,
+                    "speed":   d.get("ms_per_image", d.get("ms_per_patch", 10.0))
                 })
 
     df = pd.DataFrame(models_data)
@@ -150,7 +152,7 @@ def plot_model_comparison():
     ax1.set_title('Heritage Building Classification — Model Performance Comparison\n(Primary Benchmark: Standardized Buildings)', pad=15)
     ax1.set_xticks(x)
     ax1.set_xticklabels(df['name'], fontweight='bold')
-    ax1.set_ylim(0, 55)
+    ax1.set_ylim(0, 105)
     ax1.legend(loc='upper left', frameon=True)
     ax1.grid(axis='y', linestyle='--', alpha=0.5)
 
@@ -170,12 +172,14 @@ def plot_model_comparison():
                     ha='center', va='bottom', fontweight='bold', fontsize=9.5, color='#1b4f72')
 
     # Winner callout
-    winner_idx = df['std_acc'].idxmax()
-    ax1.annotate('[Best Model] (43.40%)',
-                 xy=(winner_idx - width/2, df.loc[winner_idx, 'std_acc'] * 100),
-                 xytext=(winner_idx - 0.2, df.loc[winner_idx, 'std_acc'] * 100 + 5),
-                 arrowprops=dict(facecolor='gold', shrink=0.08, width=2, headwidth=8),
-                 fontweight='bold', color='#b7950b', fontsize=11)
+    if len(df) > 0:
+        winner_idx = df['std_acc'].idxmax()
+        best_val = df.loc[winner_idx, 'std_acc'] * 100
+        ax1.annotate(f'[Best Model] ({best_val:.2f}%)',
+                     xy=(winner_idx - width/2, best_val),
+                     xytext=(winner_idx - 0.2, min(best_val + 7, 100)),
+                     arrowprops=dict(facecolor='gold', shrink=0.08, width=2, headwidth=8),
+                     fontweight='bold', color='#b7950b', fontsize=11)
 
     plt.tight_layout()
     output_path = OUTPUT_DIR / "model_comparison_chart.png"
@@ -257,7 +261,7 @@ def plot_per_class_f1():
     ax.set_title('Per-Class F1 Score Breakdown Across Heritage Architectural Styles', pad=15)
     ax.set_xticks(x)
     ax.set_xticklabels(CLASS_LABELS, fontweight='bold', fontsize=11)
-    ax.set_ylim(0, 65)
+    ax.set_ylim(0, 105)
     ax.legend(loc='upper right', frameon=True)
     ax.grid(axis='y', linestyle='--', alpha=0.5)
 
