@@ -48,11 +48,11 @@ def load_model(model_key: str, checkpoint_path: Path, device: torch.device) -> t
     except Exception as e:
         print(f"Warning: Could not load '{timm_id}' ({e}). Attempting fallback architecture...")
         fallback_ids = {
-            "swinv2": "swinv2_tiny_window8_256.ms_in1k",
-            "dinov2": "vit_small_patch14_dinov2.lvd142m"
+            "swinv2": "swinv2_tiny_window16_256.ms_in1k",
+            "dinov2": "vit_base_patch14_dinov2.lvd142m"
         }
         fallback_id = fallback_ids.get(model_key, timm_id)
-        if model_key == "swinv2" and fallback_id == "swinv2_tiny_window8_256.ms_in1k":
+        if model_key == "swinv2":
             actual_input_size = 256
         model = timm.create_model(fallback_id, pretrained=False, num_classes=NUM_CLASSES, **extra)
         model.load_state_dict(ckpt["model_state"])
