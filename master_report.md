@@ -42,9 +42,11 @@ Bộ dữ liệu gốc ban đầu được cung cấp cho đồ án tập trung 
 4. **B2 (post-1986-modern):** Kiến trúc hiện đại đương đại xây dựng sau năm 1986.
 
 #### Cấu trúc và Thách thức từ Dữ liệu Gốc Ban đầu:
-- **Đặc điểm Dữ liệu Gốc Ban đầu (Raw Images):** Bộ dữ liệu bao gồm **10,000+ bức ảnh toàn cảnh** các công trình kiến trúc tại TP.HCM và Hà Nội, với độ phân giải rất lớn lên tới **$6000 \times 4000$ pixels** (hàng chục Megapixels).
+- **Quy mô Tòa nhà & Ảnh Gốc (Raw Building & Photo Breakdown):**
+  - **Tổng số Tòa nhà (Unique Building Folders):** **`137` Tòa nhà di sản kiến trúc** (gồm `102` tòa thuộc tập dữ liệu chuẩn hóa và `35` tòa thuộc tập Reference Benchmark).
+  - **Tổng số Ảnh Gốc Toàn cảnh:** **`8,405` bức ảnh gốc** độ phân giải rất lớn lên tới **$6000 \times 4000$ pixels** (hàng chục Megapixels).
 - **Thách thức về Tính toán & Mất mát Thông tin:**
-  - *Quá tải VRAM GPU:* Đưa trực tiếp ảnh $6000 \times 4000$ vào mô hình Deep Learning sẽ vượt quá dung lượng bộ nhớ GPU.
+  - *Quá tải VRAM GPU:* Đưa trực tiếp 8,405 bức ảnh $6000 \times 4000$ vào mô hình Deep Learning sẽ vượt quá dung lượng bộ nhớ GPU.
   - *Mất mát hoa văn khi nén ảnh:* Nếu nén trực tiếp (downscale) bức ảnh $6000 \times 4000$ về $224 \times 224$, toàn bộ các chi tiết hoa văn vi mô quý giá (phào chỉ, cửa vòm, đầu đao) sẽ bị nhòe và biến mất hoàn toàn.
 - **Thách thức Nhiễu Bối cảnh Đô thị (Urban Environment Noise):** Bức ảnh chụp thực tế chứa một lượng lớn thông tin thừa không liên quan đến phong cách kiến trúc: bầu trời rộng lớn, dây điện chăng chịt, cột điện, mặt đường nhựa, xe cộ và cây cối che khuất mặt tiền.
 
