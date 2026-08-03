@@ -27,7 +27,7 @@
 ### 1.1 Bài toán Thị giác Máy tính & Ứng dụng Thực tế (Computer Vision Task & Applications)
 Thị giác Máy tính (Computer Vision) là một lĩnh vực của Trí tuệ Nhân tạo hướng tới việc giúp máy tính có khả năng "nhìn", hiểu và trích xuất thông tin ngữ cảnh từ hình ảnh hoặc video số. Trong đồ án này, bài toán đặt ra là **Phân loại Ảnh Kiến trúc đa lớp (Multi-Class Architectural Style Image Classification)** — một bài toán thuộc lĩnh vực nhận dạng mẫu (Pattern Recognition) và học sâu (Deep Learning).
 
-#### Các Ứng dụng Thực tế của Thị giác Máy tính trong Bảo tồn Kiến trúc:
+#### Các ứng dụng tiềm năng của dự án trong Bảo tồn Kiến trúc:
 1. **Số hóa và Lưu trữ Di sản Số (Digital Heritage Archiving):** Tự động phân loại, lưu trữ và quản lý hàng nghìn bức ảnh công trình di sản tại TP. Hồ Chí Minh mà không phụ thuộc vào việc gán nhãn thủ công tốn thời gian.
 2. **Quy hoạch Đô thị và Quản lý Đô thị Thông minh (Smart City Planning):** Hỗ trợ các cơ quan quản lý nhận diện nhanh các công trình mang giá trị lịch sử - kiến trúc cần được bảo tồn trước khi thực hiện cải tạo đô thị.
 3. **Ứng dụng Du lịch và Giáo dục Thông minh (Smart Tourism & Education):** Cung cấp lõi công nghệ cho các ứng dụng di động cho phép du khách quét (scan) công trình di sản và nhận thông tin tự động về phong cách kiến trúc, niên đại và lịch sử.
@@ -35,14 +35,17 @@ Thị giác Máy tính (Computer Vision) là một lĩnh vực của Trí tuệ 
 ---
 
 ### 1.2 Đặc điểm Bộ Dữ liệu Gốc Ban đầu (Original Initial Dataset)
-Bộ dữ liệu gốc ban đầu được cung cấp cho đồ án tập trung vào các công trình di sản kiến trúc tại TP. Hồ Chí Minh, được gán nhãn chính thức theo 4 lớp phong cách chính:
+Bộ dữ liệu gốc ban đầu được cung cấp cho đồ án tập trung vào các công trình kiến trúc tiêu biểu tại Thành phố Hồ Chí Minh và Hà Nội, được gán nhãn chính thức theo 4 lớp phong cách:
 1. **A1 (pre-1986-colonial):** Kiến trúc thuộc địa Pháp cổ và phong cách cổ điển trước năm 1986.
 2. **A2 (post-1986-colonial):** Kiến trúc thuộc địa phong cách Tân cổ điển xây dựng tái thiết sau năm 1986.
 3. **B1 (pre-1986-modern):** Kiến trúc hiện đại / nhiệt đới trước năm 1986.
 4. **B2 (post-1986-modern):** Kiến trúc hiện đại đương đại xây dựng sau năm 1986.
 
 #### Cấu trúc và Thách thức từ Dữ liệu Ban đầu:
-- **Dữ liệu mảnh ảnh (Patches):** Các bức ảnh tòa nhà gốc ban đầu được chia nhỏ thành **183,674 patches** kích thước nhỏ nhằm phục vụ huấn luyện mô hình.
+- **Dữ liệu gốc (raw):** Bộ dữ liệu gốc bao gồm $10,000+$ bức ảnh các công trình kiến trúc tại TP.HCM và Hà Nội với kích thước rất lớn (lên tới $6000 \times 4000$). Việc tính toán và suy luận trực tiếp trên ảnh gốc ban đầu gây chi phí tài nguyên quá lớn và không đảm bảo hiệu năng do thông tin bối cảnh thừa.
+- **Chiến lược Phân mảnh Ảnh (Patching Strategy):** Việc cắt ảnh gốc thành **183,674 patches** kích thước nhỏ chuẩn hóa là chiến lược then chốt mang lại 2 lợi ích cốt lõi:
+  1. *Tăng cường quy mô mẫu (Sample Expansion):* Biến bộ dữ liệu ảnh gốc số lượng mẫu hạn chế thành tập dữ liệu lớn gần 184k mẫu, cung cấp đủ dữ liệu cho các mô hình Deep Learning và Vision Transformers sâu fine-tune hiệu quả.
+  2. *Tập trung trích xuất Đặc trưng Vi mô (Micro-Pattern Focus):* Ép mô hình tập trung học các chi tiết kiến trúc nhỏ định hình phong cách (mái ngói âm dương, bờ gờ uốn cong, phào chỉ, hoa văn cửa vòm, mảng kính) thay vì phải xử lý bức ảnh $6000 \times 4000$ khổng lồ chứa một lượng lớn thông tin không giúp định nghĩa pattern.
 - **Thách thức Nhiễu Bối cảnh Đô thị:** Dữ liệu gốc chứa rất nhiều patch rác không mang thông tin kiến trúc như: bầu trời rộng, dây điện chăng chịt, cột điện, mặt đường nhựa, xe cộ và cây cối che khuất công trình.
 - **Thách thức Rò rỉ Dữ liệu (Data Leakage):** Nếu phân chia ngẫu nhiên (Random Split) các patch mà không gom nhóm theo từng tòa nhà gốc, các patch cùng một công trình sẽ xuất hiện đồng thời ở cả tập Train và Test, khiến mô hình bị "học thuộc" và cho kết quả ảo.
 
