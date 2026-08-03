@@ -34,8 +34,8 @@ Thị giác Máy tính (Computer Vision) là một lĩnh vực của Trí tuệ 
 
 ---
 
-### 1.2 Đặc điểm Bộ Dữ liệu Gốc Ban đầu (Original Initial Dataset)
-Bộ dữ liệu gốc ban đầu được cung cấp cho đồ án tập trung vào các công trình kiến trúc tiêu biểu tại Thành phố Hồ Chí Minh và Hà Nội, được gán nhãn chính thức theo 4 lớp phong cách:
+### 1.2 Đặc điểm Bộ Dữ liệu (Dataset Characteristics)
+Bộ dữ liệu gốc ban đầu được cung cấp bao gồm **137 công trình kiến trúc** tại Thành phố Hồ Chí Minh và Hà Nội, được gán nhãn theo 4 lớp phong cách:
 1. **A1 (pre-1986-colonial):** Kiến trúc thuộc địa Pháp cổ và phong cách cổ điển trước năm 1986.
 2. **A2 (post-1986-colonial):** Kiến trúc thuộc địa phong cách Tân cổ điển xây dựng tái thiết sau năm 1986.
 3. **B1 (pre-1986-modern):** Kiến trúc hiện đại / nhiệt đới trước năm 1986.
@@ -43,12 +43,17 @@ Bộ dữ liệu gốc ban đầu được cung cấp cho đồ án tập trung 
 
 #### Cấu trúc và Thách thức từ Dữ liệu Gốc Ban đầu:
 - **Quy mô Tòa nhà & Ảnh Gốc (Raw Building & Photo Breakdown):**
-  - **Tổng số Tòa nhà (Unique Building Folders):** **`137` Tòa nhà di sản kiến trúc** (gồm `102` tòa thuộc tập dữ liệu chuẩn hóa và `35` tòa thuộc tập Reference Benchmark).
+  - **Tổng số Tòa nhà (Unique Building Folders):** **`137` Tòa nhà di sản kiến trúc** (gồm `102` tòa đã được chuẩn hóa và `35` tòa cần chỉnh sửa - sẽ chỉ sử dụng làm tập dữ liệu tham khảo).
   - **Tổng số Ảnh Gốc Toàn cảnh:** **`8,405` bức ảnh gốc** độ phân giải rất lớn lên tới **$6000 \times 4000$ pixels** (hàng chục Megapixels).
-- **Thách thức về Tính toán & Mất mát Thông tin:**
-  - *Quá tải VRAM GPU:* Đưa trực tiếp 8,405 bức ảnh $6000 \times 4000$ vào mô hình Deep Learning sẽ vượt quá dung lượng bộ nhớ GPU.
-  - *Mất mát hoa văn khi nén ảnh:* Nếu nén trực tiếp (downscale) bức ảnh $6000 \times 4000$ về $224 \times 224$, toàn bộ các chi tiết hoa văn vi mô quý giá (phào chỉ, cửa vòm, đầu đao) sẽ bị nhòe và biến mất hoàn toàn.
-- **Thách thức Nhiễu Bối cảnh Đô thị (Urban Environment Noise):** Bức ảnh chụp thực tế chứa một lượng lớn thông tin thừa không liên quan đến phong cách kiến trúc: bầu trời rộng lớn, dây điện chăng chịt, cột điện, mặt đường nhựa, xe cộ và cây cối che khuất mặt tiền.
+- **5 Thách thức Cốt lõi của Dữ liệu Gốc Ban đầu:**
+  1. *Ảnh Kích thước Rất lớn & Mất mát Thông tin:* Việc đưa 8,405 bức ảnh $6000 \times 4000$ trực tiếp vào mạng Deep Learning gây quá tải VRAM GPU, còn nếu nén ảnh trực tiếp (downscale) về $224 \times 224$ sẽ làm toàn bộ chi tiết hoa văn vi mô quý giá (phào chỉ, cửa vòm, đầu đao) bị nhòe và biến mất hoàn toàn.
+  2. *Mất Cân bằng Lớp Nghiêm trọng (Class Imbalance):* Số lượng mẫu giữa 4 lớp phong cách có sự chênh lệch lớn (lớp A1 Pháp cổ và B1 Hiện đại chiếm số lượng áp đảo so với A2 Tân cổ điển và B2 Đương đại), gây ra hiện tượng thiên vị (bias) trong quá trình mô hình phân loại.
+  3. *Hạn chế về Số lượng Tòa nhà (`building_id` Diversity):* Tổng số lượng công trình chuẩn hóa chỉ có 102 tòa nhà. Nếu phân chia dữ liệu ngẫu nhiên theo patch thay vì theo `building_id`, mô hình sẽ bị **Rò rỉ Dữ liệu (Data Leakage)** nghiêm trọng và "học thuộc" bối cảnh tòa nhà thay vì học phong cách kiến trúc.
+  4. *Nhiễu Bối cảnh Đô thị Phức tạp (Urban Noise):* Bức ảnh chụp thực tế chứa lượng lớn thành phần không liên quan: bầu trời rộng lớn, mạng lưới dây điện chăng chịt, cột điện, mặt đường nhựa, xe cộ và cây cối che khuất mặt tiền.
+  5. *Nhiễu do Điều kiện Chụp Đa dạng (Shooting Variance):*
+     - **Góc chụp biến thiên:** Ảnh chụp trực diện, góc nghiêng, chụp từ dưới lên (low-angle) hoặc chụp từ xa.
+     - **Thời gian & Ánh sáng chụp:** Thời điểm chụp khác nhau (nắng gắt, cháy sáng, bóng râm, chạng vạng) và ảnh tư liệu lịch sử bị mất màu hoặc mờ nét.
+     - **Thiết bị chụp không đồng nhất:** Ảnh thu thập từ nhiều thiết bị khác nhau (máy ảnh chuyên dụng DSLR, máy ảnh cơ cổ điển, smartphone) với tiêu cự, độ phân giải, độ sắc nét và sắc thái màu sắc khác nhau.
 
 - **Chiến lược Phân mảnh Ảnh (Patching Strategy - Từ ~10k Ảnh Gốc thành 183,674 Patches):**
   - Nhận thấy ảnh gốc kích thước lớn ($6000 \times 4000$) là một **cơ hội tuyệt vời để làm tăng tính đa dạng mẫu và phong cách (sample & style diversity)**, nhóm nghiên cứu đã áp dụng kỹ thuật phân mảnh ảnh.
