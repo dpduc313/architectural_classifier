@@ -196,19 +196,37 @@ flowchart TD
 Nhóm triển khai và so sánh 4 mô hình tiêu biểu đại diện cho các trường phái:
 
 ```mermaid
-graph LR
-    InputImage[Input Patch Image] --> ResNet50[ResNet-50 (Baseline CNN)]
-    InputImage --> ViT[Vision Transformer ViT-B/16]
-    InputImage --> DINOv2[Meta DINOv2 Self-Sup. ViT]
-    InputImage --> Swinv2[Swin Transformer V2 384x384]
+flowchart TD
+    %% Styling Rules
+    classDef inputStyle fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1
+    classDef modelStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c
+    classDef headStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#bf360c
+    classDef outputStyle fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#1b5e20
 
-    ResNet50 --> MultiTaskHead[Dual Multi-Task Classifier Head]
-    ViT --> MultiTaskHead
-    DINOv2 --> MultiTaskHead
-    Swinv2 --> MultiTaskHead
+    subgraph Stage1["1. Giai đoạn Đầu vào (Input Layer)"]
+        InputPatch["Patch Ảnh Kiến trúc<br/><i>Rescaled 224x224 / 384x384</i>"]:::inputStyle
+    end
 
-    MultiTaskHead --> OutputStyle[Style Predictions: A1, A2, B1, B2]
-    MultiTaskHead --> OutputArch[Sub-label Predictions: Arch vs Non-Arch]
+    subgraph Stage2["2. Bộ Suite 4 Mô hình Trích xuất Đặc trưng (Backbone Suite)"]
+        ResNet50["<b>ResNet-50</b><br/><i>Baseline CNN</i>"]:::modelStyle
+        ViT["<b>Vision Transformer (ViT-B/16)</b><br/><i>Flat Patch Attention</i>"]:::modelStyle
+        DINOv2["<b>Meta DINOv2</b><br/><i>Self-Supervised ViT</i>"]:::modelStyle
+        Swinv2["<b>Swin Transformer V2</b><br/><i>Shifted Window Attention</i>"]:::modelStyle
+    end
+
+    subgraph Stage3["3. Đầu Phân loại Đa nhiệm (Dual Multi-Task Classifier Head)"]
+        FCHead["<b>Shared Linear Layer & Dropout</b><br/><i>Tổng hợp Vectơ Đặc trưng</i>"]:::headStyle
+    end
+
+    subgraph Stage4["4. Kết quả Đầu ra Đa nhiệm (Multi-Task Outputs)"]
+        OutputStyle["<b>Nhiệm vụ 1 (Chính):</b><br/>Phân loại 4 Phong cách Kiến trúc<br/>(A1, A2, B1, B2)"]:::outputStyle
+        OutputArch["<b>Nhiệm vụ 2 (Nhãn phụ):</b><br/>Lọc Nhiễu Nhị phân<br/>(Architectural vs Non-Architectural)"]:::outputStyle
+    end
+
+    %% Flow Connections
+    InputPatch --> ResNet50 & ViT & DINOv2 & Swinv2
+    ResNet50 & ViT & DINOv2 & Swinv2 --> FCHead
+    FCHead --> OutputStyle & OutputArch
 ```
 
 1. **ResNet-50 (`resnet50.a1_in1k`):** Mạng CNN 50 lớp với các khối Residual Block, làm baseline đối chứng.
