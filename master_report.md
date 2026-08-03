@@ -24,20 +24,46 @@
 <a id="chuong-1-gioi-thieu-de-tai"></a>
 ## CHƯƠNG 1: GIỚI THIỆU ĐỀ TÀI (INTRODUCTION)
 
-### 1.1 Tính cấp thiết của đề tài
-Thành phố Hồ Chí Minh là trung tâm văn hóa - kinh tế lớn của Việt Nam với sự hòa quyện độc đáo giữa các phong cách kiến trúc qua nhiều thời kỳ lịch sử. Việc bảo tồn, số hóa và nhận diện tự động các di sản kiến trúc đóng vai trò then chốt trong công tác quy hoạch đô thị, du lịch thông minh và lưu trữ di sản số.
+### 1.1 Bài toán Thị giác Máy tính & Ứng dụng Thực tế (Computer Vision Task & Applications)
+Thị giác Máy tính (Computer Vision) là một lĩnh vực của Trí tuệ Nhân tạo hướng tới việc giúp máy tính có khả năng "nhìn", hiểu và trích xuất thông tin ngữ cảnh từ hình ảnh hoặc video số. Trong đồ án này, bài toán đặt ra là **Phân loại Ảnh Kiến trúc đa lớp (Multi-Class Architectural Style Image Classification)** — một bài toán thuộc lĩnh vực nhận dạng mẫu (Pattern Recognition) và học sâu (Deep Learning).
 
-Tuy nhiên, việc phân loại tự động ảnh kiến trúc đối mặt với những thách thức lớn:
-- **Tính đa dạng và phức tạp của bối cảnh đô thị:** Ảnh chụp thực tế thường bị nhiễu bởi dây điện, cột điện, cây cối, xe cộ, bầu trời và người đi đường.
-- **Sự tương đồng về đặc trưng giữa các phong cách:** Sự giao thoa giữa các yếu tố kiến trúc Pháp cổ (Colonial) và kiến trúc Hiện đại (Modernism) gây khó khăn cho các mô hình học máy truyền thống.
-- **Hiện tượng rò rỉ dữ liệu (Data Leakage):** Việc cắt một bức ảnh tòa nhà thành nhiều mảnh (patches) rồi phân chia ngẫu nhiên vào tập Train và Test dễ khiến mô hình "học thuộc" thay vì nhận diện đặc trưng phong cách.
+#### Các Ứng dụng Thực tế của Thị giác Máy tính trong Bảo tồn Kiến trúc:
+1. **Số hóa và Lưu trữ Di sản Số (Digital Heritage Archiving):** Tự động phân loại, lưu trữ và quản lý hàng nghìn bức ảnh công trình di sản tại TP. Hồ Chí Minh mà không phụ thuộc vào việc gán nhãn thủ công tốn thời gian.
+2. **Quy hoạch Đô thị và Quản lý Đô thị Thông minh (Smart City Planning):** Hỗ trợ các cơ quan quản lý nhận diện nhanh các công trình mang giá trị lịch sử - kiến trúc cần được bảo tồn trước khi thực hiện cải tạo đô thị.
+3. **Ứng dụng Du lịch và Giáo dục Thông minh (Smart Tourism & Education):** Cung cấp lõi công nghệ cho các ứng dụng di động cho phép du khách quét (scan) công trình di sản và nhận thông tin tự động về phong cách kiến trúc, niên đại và lịch sử.
 
-### 1.2 Mục tiêu nghiên cứu
-Đồ án hướng tới các mục tiêu chính:
-1. **Đề xuất quy trình xử lý dữ liệu và đánh nhãn 2 cấp độ (Novel Dual-Level Curation Protocol):** Tiến hành kiểm duyệt thủ công 100% toàn bộ bộ dữ liệu **183,674 patches**, phân loại nhãn phụ nhị phân `architectural` ($1$) vs `non-architectural` ($0$).
-2. **Đề xuất Thuật toán Biểu quyết Cấp độ Ảnh Gốc (Building-Level Majority Voting Pipeline):** Nhóm các patch về lại bức ảnh tòa nhà ban đầu, loại bỏ các patch nhiễu (bầu trời, rác đô thị) trước khi biểu quyết để dự đoán chính xác nhãn của toàn bộ công trình.
-3. **Xây dựng và so sánh Bộ Suite Mô hình tiên tiến:** Đánh giá từ mô hình CNN truyền thống (ResNet-50), Vision Transformer chuẩn (ViT-B/16), đến các mô hình State-of-the-Art mới nhất (Meta DINOv2, Swin Transformer V2).
-4. **Giải thích mô hình bằng Explainable AI (XAI):** Trực quan hóa vùng chú ý của mô hình bằng **Grad-CAM** và **SHAP** nhằm minh minh bạch hóa lý do đưa ra quyết định phân loại.
+---
+
+### 1.2 Đặc điểm Bộ Dữ liệu Gốc Ban đầu (Original Initial Dataset)
+Bộ dữ liệu gốc ban đầu được cung cấp cho đồ án tập trung vào các công trình di sản kiến trúc tại TP. Hồ Chí Minh, được gán nhãn chính thức theo 4 lớp phong cách chính:
+1. **A1 (pre-1986-colonial):** Kiến trúc thuộc địa Pháp cổ và phong cách cổ điển trước năm 1986.
+2. **A2 (post-1986-colonial):** Kiến trúc thuộc địa phong cách Tân cổ điển xây dựng tái thiết sau năm 1986.
+3. **B1 (pre-1986-modern):** Kiến trúc hiện đại / nhiệt đới trước năm 1986.
+4. **B2 (post-1986-modern):** Kiến trúc hiện đại đương đại xây dựng sau năm 1986.
+
+#### Cấu trúc và Thách thức từ Dữ liệu Ban đầu:
+- **Dữ liệu mảnh ảnh (Patches):** Các bức ảnh tòa nhà gốc ban đầu được chia nhỏ thành **183,674 patches** kích thước nhỏ nhằm phục vụ huấn luyện mô hình.
+- **Thách thức Nhiễu Bối cảnh Đô thị:** Dữ liệu gốc chứa rất nhiều patch rác không mang thông tin kiến trúc như: bầu trời rộng, dây điện chăng chịt, cột điện, mặt đường nhựa, xe cộ và cây cối che khuất công trình.
+- **Thách thức Rò rỉ Dữ liệu (Data Leakage):** Nếu phân chia ngẫu nhiên (Random Split) các patch mà không gom nhóm theo từng tòa nhà gốc, các patch cùng một công trình sẽ xuất hiện đồng thời ở cả tập Train và Test, khiến mô hình bị "học thuộc" và cho kết quả ảo.
+
+---
+
+### 1.3 Mục tiêu Đề tài & Chiến lược So sánh Mô hình (Project Goals & Model Suite Strategy)
+
+#### 1. Xây dựng Bộ Suite gồm 4 Mô hình Học sâu:
+Nhóm nghiên cứu xây dựng và huấn luyện **4 mô hình đại diện cho 4 trường phái kiến trúc mạng khác nhau**:
+- **Baseline CNN:** **ResNet-50** (`resnet50.a1_in1k`) — đại diện cho kiến trúc mạng cuộn truyền thống với kết nối tắt (Residual Connections).
+- **Standard Vision Transformer:** **ViT-B/16** (`vit_base_patch16_224.augreg2_in21k_ft_in1k`) — đại diện cho kiến trúc Vision Transformer thuần túy với patch $16 \times 16$.
+- **Self-Supervised Vision Transformer:** **Meta DINOv2** (`vit_base_patch14_dinov2.lvd142m`) — đại diện cho mô hình tiền huấn luyện tự giám sát tiên tiến của Meta AI.
+- **Hierarchical Shifted-Window Transformer:** **Swin Transformer V2** (`swin_base_patch4_window12_384.ms_in22k`) — đại diện cho kiến trúc Transformer phân cấp xử lý độ phân giải cao $384 \times 384$.
+
+#### 2. Chiến lược So sánh và Đánh giá Chi tiết:
+Đồ án thực hiện so sánh toàn diện 4 mô hình trên các khía cạnh:
+- **Đánh giá Cấp độ Patch:** So sánh Accuracy, Precision, Recall, Macro-F1, Weighted-F1 trên tập Test Chuẩn hóa (24,263 patches).
+- **Đánh giá Cấp độ Ảnh Tòa nhà Gốc (Building-Level Voting Accuracy):** Đánh giá độ chính xác sau khi áp dụng Thuật toán Lọc Patch Kiến trúc (`architectural` vs `non-architectural`) và Biểu quyết Số đông (Majority Voting).
+- **Đánh giá Khả năng Tổng quát hóa (Generalization):** Đánh giá độ chính xác trên tập **Reference Benchmark Test Set (25,396 patches)** chứa các ảnh tư liệu lịch sử ngoài tập chuẩn hóa.
+- **So sánh Chi phí Tính toán & Tốc độ Suy luận (Inference Speed - ms/patch):** So sánh thời gian xử lý thực tế trên GPU.
+- **Giải thích Mô hình bằng Explainable AI (XAI):** Trực quan hóa vùng chú ý (Attention Heatmaps) của các mô hình tốt nhất bằng **Grad-CAM** và **SHAP** để chứng minh tính minh bạch trong quyết định phân loại.
 
 ---
 
