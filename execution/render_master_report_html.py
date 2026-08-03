@@ -7,7 +7,8 @@ import markdown
 
 PROJECT_ROOT = Path(__file__).parent.parent
 SOURCE_MD = PROJECT_ROOT / "master_report.md"
-OUTPUT_HTML = PROJECT_ROOT / "master_report.html"
+RESULTS_DIR = PROJECT_ROOT / "results"
+OUTPUT_HTML = RESULTS_DIR / "master_report.html"
 
 
 CSS = """
@@ -160,7 +161,9 @@ def build_html() -> str:
 
 
 def main() -> None:
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     html = build_html()
+    html = html.replace('<head>', '<head>\n  <base href="../" />', 1)
     OUTPUT_HTML.write_text(html, encoding="utf-8")
     print(f"Wrote {OUTPUT_HTML.relative_to(PROJECT_ROOT)}")
 

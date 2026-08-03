@@ -6,7 +6,7 @@
 > **Repository:** [dpduc313/architectural_classifier](https://github.com/dpduc313/architectural_classifier)  
 > **Ngày hoàn thành:** 03/08/2026
 
-> **Bản xem thuận tiện:** [PDF](./master_report.pdf) | [HTML](./master_report.html)
+> **Bản xem thuận tiện:** [PDF](./results/master_report.pdf) | [HTML](./results/master_report.html)
 
 ---
 
