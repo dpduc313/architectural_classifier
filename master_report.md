@@ -74,7 +74,21 @@ Bộ dữ liệu gốc ban đầu được cung cấp bao gồm **137 công trì
        $$\text{Building Ratio} = \frac{1}{H \times W} \sum_{y=1}^{H} \sum_{x=1}^{W} M(y, x)$$
        Patch được giữ lại nếu tỷ lệ diện tích tòa nhà đạt tối thiểu 1.8% (`building_ratio >= 0.018`).
      - **Kết quả Lọc lần đầu:** Giữ lại **85,991 patches** và loại bỏ **97,683 patches** vào pool rác.
-     - **Hạn chế:** YOLOv8 chỉ học nhận diện hình dáng tổng thể của cả tòa nhà (cửa ra vào, tường ngoài, mái lớn). Do đó, mô hình này bị mù màu đối với các **chi tiết kiến trúc vi mô** (hoa văn điêu khắc Pháp cổ, bờ đao, phào chỉ nhỏ, hoa văn cổng sắt di sản) nằm trong các patch chụp cận cảnh, dẫn tới việc loại bỏ sai hàng chục nghìn mẫu vật có giá trị học sâu cao.
+     - **Kết quả Huấn luyện Thử nghiệm Đợt 1 (trên 86k patches do YOLOv8 lọc):**
+
+| Mô hình | Loại kiến trúc | Số tham số | Độ phức tạp | Train Acc *(Tốt nhất)* | Test Accuracy *(Chính)* | Test Macro-F1 *(Chính)* |
+|---|---|---:|---:|---:|---:|---:|
+| **DINOv2-S** 🏆 | Transformer (Self-Supervised) | 22.0M | 4.6G | 67.62% | **52.20%** | **0.4980** |
+| **ResNet-50** | CNN (Baseline) | 25.6M | 4.1G | 84.42% | **51.72%** | **0.4950** |
+| **EfficientNet-V2-S** | CNN (Fused-MBConv) | 21.5M | 2.9G | 93.76% | 48.14% | 0.4526 |
+| **ConvNeXt-Tiny** | Modern CNN | 28.6M | 4.5G | 99.49% | 44.42% | 0.3964 |
+| **ViT-B/16** | Transformer (Flat Patch) | 86.0M | 17.6G | 95.42% | 43.54% | 0.4042 |
+| **Swin-V2-T** | Transformer (Hierarchical Window) | 28.0M | 4.5G | 94.01% | 42.89% | 0.3877 |
+
+![Kết quả huấn luyện trên 86k patches do YOLOv8 lọc](./outputs/figures/yolo_phase1_results.png)  
+*Hình 1.1: Bảng kết quả đánh giá hiệu năng thử nghiệm Đợt 1 trên 85,991 patches do YOLOv8 lọc tự động. Kết quả cho thấy mô hình tốt nhất (DINOv2-S) chỉ đạt 52.20% Test Accuracy và Macro-F1 0.4980, bị giới hạn nặng nề bởi nhiễu và việc mất mát thông tin.*
+
+     - **Hạn chế:** YOLOv8 chỉ học nhận diện hình dáng tổng thể của cả tòa nhà (cửa ra vào, tường ngoài, mái lớn). Do đó, mô hình này bị "mù màu" đối với các **chi tiết kiến trúc vi mô** (hoa văn điêu khắc Pháp cổ, bờ đao, phào chỉ nhỏ, hoa văn cổng sắt di sản) nằm trong các patch chụp cận cảnh, dẫn tới việc loại bỏ sai hàng chục nghìn mẫu vật có giá trị học sâu cao và làm hiệu năng phân loại bị kìm hãm dưới mức 53%.
   2. *Phương pháp 2: Quy trình Kiểm duyệt Thủ công 100% (100% Full Manual Human Curation Protocol):*
      - Nhóm nghiên cứu thực hiện review thủ công 100% toàn bộ **183,674 patches** ở cả 2 danh mục, phân loại nhãn phụ nhị phân `architectural` ($1$) vs `non-architectural` ($0$).
      - *Kết quả đột phá:* **Cứu lại được 32,479 patches kiến trúc quý giá** bị YOLOv8 đánh giá nhầm là rác, nâng tổng số patch kiến trúc chuẩn lên **118,470 patches (64.5%)**, đồng thời cô lập triệt để 65,204 patches nhiễu (bầu trời, dây điện, cột điện).
