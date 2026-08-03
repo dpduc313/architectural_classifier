@@ -64,14 +64,14 @@ Quá trình tinh chỉnh dữ liệu trải qua 40 đợt review liên tục v�
 
 ```mermaid
 flowchart TD
-    Raw[Master Dataset: 183,674 Patches] --> Standardized[Standardized Folders: 158,278 Patches]
-    Raw --> NonStandardized[Non-Standardized Reference: 25,396 Patches]
+    Raw["Master Dataset: 183,674 Patches"] --> Standardized["Standardized Folders: 158,278 Patches"]
+    Raw --> NonStandardized["Non-Standardized Reference: 25,396 Patches"]
     
-    Standardized -->|70% Buildings| Train[Train Split: 100,036 Patches]
-    Standardized -->|15% Buildings| Val[Val Split: 33,979 Patches]
-    Standardized -->|15% Buildings| Test[Standard Test Split: 24,263 Patches]
+    Standardized -->|"70% Buildings"| Train["Train Split: 100,036 Patches"]
+    Standardized -->|"15% Buildings"| Val["Val Split: 33,979 Patches"]
+    Standardized -->|"15% Buildings"| Test["Standard Test Split: 24,263 Patches"]
     
-    NonStandardized --> RefTest[Reference Benchmark Test Set: 25,396 Patches]
+    NonStandardized --> RefTest["Reference Benchmark Test Set: 25,396 Patches"]
 ```
 
 ### Bảng Phân bổ Các Tập Manifest:

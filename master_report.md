@@ -76,16 +76,16 @@ Nhận thấy việc tự động cắt patch bằng YOLOv8 ($\ge 1.8\%$) bỏ s
 
 ```mermaid
 flowchart TD
-    Raw[Full Master Dataset: 183,674 Patches] --> PoolA[YOLO >= 1.8% Pool: 85,991 Patches]
-    Raw --> PoolB[YOLO < 1.8% Pool: 97,683 Patches]
+    Raw["Full Master Dataset: 183,674 Patches"] --> PoolA["YOLO >= 1.8% Pool: 85,991 Patches"]
+    Raw --> PoolB["YOLO < 1.8% Pool: 97,683 Patches"]
     
-    PoolA -->|Manual Human Curation 100%| KeptClean[Kept Architectural: 85,991 Patches]
-    PoolB -->|Manual Human Curation 100%| Rescued[Rescued Architectural: 32,479 Patches]
-    PoolB -->|Manual Human Curation 100%| FilteredNoise[Filtered Non-Architectural: 65,204 Patches]
+    PoolA -->|"Manual Human Curation 100%"| KeptClean["Kept Architectural: 85,991 Patches"]
+    PoolB -->|"Manual Human Curation 100%"| Rescued["Rescued Architectural: 32,479 Patches"]
+    PoolB -->|"Manual Human Curation 100%"| FilteredNoise["Filtered Non-Architectural: 65,204 Patches"]
     
-    KeptClean --> FinalArch[True Curated Dataset: 118,470 Architectural Patches (Sub-label 1)]
+    KeptClean --> FinalArch["True Curated Dataset: 118,470 Architectural Patches (Sub-label 1)"]
     Rescued --> FinalArch
-    FilteredNoise --> NonArch[Noise / Sky Dataset: 65,204 Non-Architectural Patches (Sub-label 0)]
+    FilteredNoise --> NonArch["Noise / Sky Dataset: 65,204 Non-Architectural Patches (Sub-label 0)"]
 ```
 
 #### 3 Tiêu chí Lọc Dữ liệu Nghiêm ngặt:
@@ -215,12 +215,12 @@ $$L_{\text{Grad-CAM}}^c = \text{ReLU}\left( \sum_{k} \alpha_k^c A^k \right)$$
 
 ```mermaid
 flowchart LR
-    Input[Input Patch Image] --> Model[Swin V2 / DINOv2 Backbone]
-    Model --> FeatureMaps[Last Layer Feature Maps A^k]
-    FeatureMaps --> ClassScore[Class Output Score y^c]
-    ClassScore -->|Backprop Gradient d(y^c)/d(A^k)| Gradients[Gradients alpha_k^c]
-    Gradients --> Heatmap[Grad-CAM Attention Heatmap]
-    Heatmap --> Overlay[Overlay Heatmap on Image]
+    Input["Input Patch Image"] --> Model["Swin V2 / DINOv2 Backbone"]
+    Model --> FeatureMaps["Last Layer Feature Maps A_k"]
+    FeatureMaps --> ClassScore["Class Output Score y_c"]
+    ClassScore -->|"Backprop Gradient dy/dA"| Gradients["Gradients alpha_k"]
+    Gradients --> Heatmap["Grad-CAM Attention Heatmap"]
+    Heatmap --> Overlay["Overlay Heatmap on Image"]
 ```
 
 #### Kết quả Trực quan hóa Grad-CAM:
