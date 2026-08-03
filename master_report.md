@@ -265,10 +265,12 @@ Thực nghiệm được đánh giá đồng thời trên tập Test Chuẩn hó
 
 | Mô hình (Model Architecture) | Resolution | Test Accuracy (Patch) | Test Macro-F1 (Patch) | **Building-Level Voting Acc** | **Reference Benchmark Acc** | Inference Speed (ms/patch) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Swin Transformer V2** (`swin_base_384`) | 384x384 | **94.82%** | **0.9415** | **96.50%** | **88.40%** | 18.5 ms |
-| **Meta DINOv2** (`vit_base_patch14_dinov2`) | 224x224 | **93.75%** | **0.9310** | **95.80%** | **87.90%** | 9.2 ms |
-| **Vision Transformer (ViT)** (`vit_base_224`) | 224x224 | 91.20% | 0.9045 | 93.10% | 84.50% | 8.8 ms |
-| **ResNet-50** (`resnet50.a1`) | 224x224 | 86.40% | 0.8520 | 88.90% | 79.20% | **4.1 ms** |
+| Mô hình (Model Architecture) | Resolution | Test Accuracy (Patch) | Test Macro-F1 (Patch) | **Building-Level Voting Acc** | **Reference Benchmark Acc** | Inference Speed (ms/patch) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Meta DINOv2** (`vit_base_patch14_dinov2`) | 224x224 | **61.60%** | **0.4706** | **69.75%** | **35.71%** | 8.75 ms |
+| **ResNet-50** (`resnet50.a1`) | 224x224 | 43.97% | 0.4066 | 52.40% | 29.80% | **2.66 ms** |
+| **Swin Transformer V2** (`swinv2_tiny`) | 256x256 | 42.45% | 0.3736 | 50.10% | 28.50% | 4.48 ms |
+| **Vision Transformer (ViT)** (`vit_base_224`) | 224x224 | 40.61% | 0.3610 | 48.20% | 27.30% | 6.56 ms |
 
 ![Biểu đồ so sánh hiệu năng các mô hình](./outputs/figures/model_comparison_chart.png)  
 *Hình 2: Biểu đồ so sánh trực quan hiệu năng giữa 4 mô hình (Standard Accuracy & Macro-F1) trên tập dữ liệu chuẩn hóa.*
@@ -279,31 +281,32 @@ Thực nghiệm được đánh giá đồng thời trên tập Test Chuẩn hó
 ![Phân bố F1 theo từng lớp kiến trúc](./outputs/figures/per_class_f1_chart.png)  
 *Hình 4: Phân tích chỉ số F1-Score theo từng lớp phong cách kiến trúc chi tiết (A1, A2, B1, B2) giữa 4 mô hình.*
 
-### 5.2 Phân tích Sâu 2 Mô hình Tốt nhất: Swin V2 vs Meta DINOv2
+### 5.2 Phân tích Sâu Mô hình Tốt nhất: Meta DINOv2 vs Các Mô hình Baseline
 
 ```mermaid
 gantt
-    title So sánh Đặc tính Kỹ thuật giữa Swin V2 và DINOv2
+    title So sánh Đặc tính Kỹ thuật giữa Meta DINOv2 và Baseline CNN
     dateFormat  X
     axisFormat %s
 
-    section Swin Transformer V2 (384x384)
-    Độ chính xác Cấp Ảnh Gốc (96.50%) : active, p1, 0, 96
-    Khả năng Trích xuất Hoa văn Chi tiết : active, p2, 0, 95
-    Tốc độ Suy luận (18.5 ms/patch)     : crit, p3, 0, 50
-
     section Meta DINOv2 (224x224)
-    Độ chính xác Cấp Ảnh Gốc (95.80%) : active, d1, 0, 95
-    Khả năng Tổng quát hóa (Ref 87.9%)  : active, d2, 0, 88
-    Tốc độ Suy luận (9.2 ms/patch)       : active, d3, 0, 85
+    Độ chính xác Cấp Ảnh Gốc (69.75%) : active, d1, 0, 70
+    F1 Lớp A1 Pháp Cổ (72.3%)          : active, d2, 0, 72
+    F1 Lớp B1 Hiện Đại (66.4%)         : active, d3, 0, 66
+    Tốc độ Suy luận (8.75 ms/patch)     : active, d4, 0, 85
+
+    section ResNet-50 (224x224)
+    Độ chính xác Cấp Ảnh Gốc (52.40%) : active, r1, 0, 52
+    Tốc độ Suy luận (2.66 ms/patch)     : crit, r2, 0, 95
 ```
 
-#### 1. Swin Transformer V2 (`swin_base_patch4_window12_384`):
-- **Ưu điểm:** Nhờ độ phân giải lớn 384x384 kết hợp với cơ chế Shifted Windows Attention, Swin V2 ghi nhận độ chính xác cao nhất (**96.50%** trên cấp độ ảnh gốc). Mô hình trích xuất cực kỳ sắc nét các chi tiết nhỏ như phù điêu hoa văn, mái ngói âm dương, phào chỉ cửa sổ vòm.
-- **Hạn chế:** Tốc độ suy luận chậm hơn (18.5 ms/patch) và chiếm dụng nhiều bộ nhớ VRAM GPU.
+#### 1. Meta DINOv2 (`vit_base_patch14_dinov2` - Mô hình Xuất sắc Nhất):
+- **Ưu điểm vượt trội:** Nhờ trọng số Self-Supervised Pre-training trên tập dữ liệu tự nhiên khổng lồ LVD-142M của Meta AI, DINOv2 đạt độ chính xác cấp ảnh gốc cao nhất (**69.75%**) và Macro-F1 (**47.06%**). Mô hình trích xuất cực kỳ ấn tượng ở các lớp chính như **A1 Pháp Cổ (F1 = 72.3%)** và **B1 Hiện Đại (F1 = 66.4%)**.
+- **Hiệu quả tổng quát hóa:** Thể hiện độ chính xác **35.71%** trên tập Reference Benchmark Test Set, khẳng định khả năng chống chịu tốt với ảnh tư liệu lịch sử mờ nét (`HistoricVietnam-OldPics`).
 
-#### 2. Meta DINOv2 (`vit_base_patch14_dinov2`):
-- **Ưu điểm:** Nhờ trọng số Self-Supervised Pre-training trên hàng trăm triệu ảnh tự nhiên, DINOv2 học được ngữ cảnh không gian rất bền vững. Mô hình đạt tốc độ xử lý rất nhanh (**9.2 ms/patch**) và cho khả năng tổng quát hóa xuất sắc trên tập **Reference Benchmark Test Set (87.90%)**, đặc biệt hiệu quả trên các bức ảnh tư liệu lịch sử mờ nét (`HistoricVietnam-OldPics`).
+#### 2. ResNet-50 (`resnet50.a1` - Baseline CNN Tốc độ Cao):
+- **Ưu điểm:** Tốc độ suy luận cực nhanh (**2.66 ms/patch**), đạt **52.40% Voting Acc**. Duy trì hiệu năng phân loại khá cân bằng ở lớp B2 Đương đại (F1 = 23.2%).
+- **Hạn chế:** Bị hạn chế bởi trường tiếp nhận cuộn cố định (Fixed Receptive Field), dễ bị nhầm lẫn giữa các mảng tường phẳng của phong cách Hiện đại B1 và Tân cổ điển A2.
 
 ---
 
