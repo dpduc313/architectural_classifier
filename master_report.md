@@ -42,12 +42,22 @@ Bộ dữ liệu gốc ban đầu được cung cấp cho đồ án tập trung 
 4. **B2 (post-1986-modern):** Kiến trúc hiện đại đương đại xây dựng sau năm 1986.
 
 #### Cấu trúc và Thách thức từ Dữ liệu Ban đầu:
-- **Dữ liệu gốc (raw):** Bộ dữ liệu gốc bao gồm $10,000+$ bức ảnh các công trình kiến trúc tại TP.HCM và Hà Nội với kích thước rất lớn (lên tới $6000 \times 4000$). Việc tính toán và suy luận trực tiếp trên ảnh gốc ban đầu gây chi phí tài nguyên quá lớn và không đảm bảo hiệu năng do thông tin bối cảnh thừa.
-- **Chiến lược Phân mảnh Ảnh (Patching Strategy):** Việc cắt ảnh gốc thành **183,674 patches** kích thước nhỏ chuẩn hóa là chiến lược then chốt mang lại 2 lợi ích cốt lõi:
-  1. *Tăng cường quy mô mẫu (Sample Expansion):* Biến bộ dữ liệu ảnh gốc số lượng mẫu hạn chế thành tập dữ liệu lớn gần 184k mẫu, cung cấp đủ dữ liệu cho các mô hình Deep Learning và Vision Transformers sâu fine-tune hiệu quả.
-  2. *Tập trung trích xuất Đặc trưng Vi mô (Micro-Pattern Focus):* Ép mô hình tập trung học các chi tiết kiến trúc nhỏ định hình phong cách (mái ngói âm dương, bờ gờ uốn cong, phào chỉ, hoa văn cửa vòm, mảng kính) thay vì phải xử lý bức ảnh $6000 \times 4000$ khổng lồ chứa một lượng lớn thông tin không giúp định nghĩa pattern.
-- **Thách thức Nhiễu Bối cảnh Đô thị:** Dữ liệu gốc chứa rất nhiều patch rác không mang thông tin kiến trúc như: bầu trời rộng, dây điện chăng chịt, cột điện, mặt đường nhựa, xe cộ và cây cối che khuất công trình.
-- **Thách thức Rò rỉ Dữ liệu (Data Leakage):** Nếu phân chia ngẫu nhiên (Random Split) các patch mà không gom nhóm theo từng tòa nhà gốc, các patch cùng một công trình sẽ xuất hiện đồng thời ở cả tập Train và Test, khiến mô hình bị "học thuộc" và cho kết quả ảo.
+- **Chiến lược Phân mảnh Ảnh (Patching Strategy - Từ ~10k Ảnh Gốc thành 183,674 Patches):**
+  - Nhận thấy ảnh gốc kích thước lớn ($6000 \times 4000$) là một **cơ hội tuyệt vời để làm tăng tính đa dạng mẫu và phong cách (sample & style diversity)**, nhóm nghiên cứu đã áp dụng kỹ thuật phân mảnh ảnh.
+  - Mỗi bức ảnh $6000 \times 4000$ được chia nhỏ thành các patch hình vuông có kích thước **$1000 \times 1000$ pixels**.
+  - **Ưu điểm của Tỷ lệ Hình vuông $1:1$:** Giúp quá trình rescale về kích thước đầu vào tiêu chuẩn của các mô hình học sâu ($224 \times 224$ cho ResNet/ViT/DINOv2 hoặc $384 \times 384$ cho Swin V2) diễn ra tự nhiên, **hoàn toàn không bị biến dạng tỷ lệ (no distortion)**, không cần thêm viền đen (zero-padding) hay cắt bỏ lề (center crop loss).
+  - **Kết quả Chuyển đổi:** Biến bộ dữ liệu ảnh gốc ban đầu (~10,000 ảnh) thành bộ dữ liệu khổng lồ **183,674 patches**, ép các mô hình tập trung trích xuất sâu các chi tiết kiến trúc vi mô (mái ngói âm dương, bờ gờ uốn cong, phào chỉ, hoa văn vòm cửa, mảng kính) thay vì thông tin nền không liên quan.
+
+- **Quá trình Lọc 183,674 Patches qua 2 Phương pháp & Tác động đến Kết quả Huấn luyện (Tham chiếu Chương 3 & Chương 5):**
+  1. *Phương pháp 1: Lọc Tự động bằng YOLOv8 ($\ge 1.8\%$ Bounding Box Area):*
+     - YOLOv8 tự động phát hiện đối tượng và chỉ giữ lại **85,991 patches** có diện tích bounding box $\ge 1.8\%$, đẩy 97,683 patches còn lại vào danh sách loại bỏ.
+     - *Hạn chế:* YOLOv8 lọc quá cứng nhắc dựa trên nhận diện đối tượng chung, dẫn đến việc **bỏ sót hàng chục nghìn patch chứa chi tiết hoa văn kiến trúc quý giá** nhưng diện tích nhỏ, làm giảm đáng kể tính đa dạng của tập huấn luyện.
+  2. *Phương pháp 2: Quy trình Kiểm duyệt Thủ công 100% (100% Full Manual Human Curation Protocol):*
+     - Nhóm nghiên cứu thực hiện review thủ công 100% toàn bộ **183,674 patches** ở cả 2 danh mục, phân loại nhãn phụ nhị phân `architectural` ($1$) vs `non-architectural` ($0$).
+     - *Kết quả đột phá:* **Cứu lại được 32,479 patches kiến trúc quý giá** bị YOLOv8 đánh giá nhầm là rác, nâng tổng số patch kiến trúc chuẩn lên **118,470 patches (64.5%)**, đồng thời cô lập triệt để 65,204 patches nhiễu (bầu trời, dây điện, cột điện).
+     - *Tác động đến Hiệu năng Huấn luyện (Tham chiếu Chương 5):* Việc huấn luyện trên tập dữ liệu đã qua Curation 100% kết hợp với Thuật toán Biểu quyết Cấp độ Ảnh Gốc đã giúp mô hình **Swin Transformer V2 đạt 96.50% Voting Acc** và **Meta DINOv2 đạt 95.80% Voting Acc**, vượt trội hoàn toàn so với việc chỉ huấn luyện trên tập YOLO sơ khai.
+
+- **Thách thức Rò rỉ Dữ liệu (Data Leakage):** Nếu phân chia ngẫu nhiên (Random Split) các patch mà không gom nhóm theo từng tòa nhà gốc, các patch cùng một công trình sẽ xuất hiện đồng thời ở cả tập Train và Test, khiến mô hình bị "học thuộc" và cho kết quả ảo. Do đó, hệ thống áp dụng chia theo ID Tòa nhà (70% Train / 15% Val / 15% Test).
 
 ---
 
