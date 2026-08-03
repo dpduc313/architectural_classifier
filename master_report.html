@@ -3,378 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Báo cáo Đồ án Thị giác Máy tính HK253 — Phân loại Di sản Kiến trúc TP.HCM</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    
-    <!-- Mermaid JS -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.min.js"></script>
+    <title>Master Report — Architectural Classifier</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            mermaid.initialize({
-                startOnLoad: true,
-                theme: 'default',
-                securityLevel: 'loose',
-                flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
-            });
+            mermaid.initialize({ startOnLoad: true });
         });
     </script>
-
-    <!-- MathJax 3 -->
     <script>
         window.MathJax = {
             tex: {
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
                 displayMath: [['$$', '$$'], ['\\[', '\\]']]
-            },
-            svg: {
-                fontCache: 'global'
             }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #0d9488;
-            --accent: #f59e0b;
-            --bg-main: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --border-color: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --radius-md: 10px;
-            --radius-lg: 16px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            line-height: 1.7;
-            font-size: 16px;
-            padding: 0;
-            margin: 0;
-        }
-
-        /* Header Header Banner */
-        .report-header {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: #ffffff;
-            padding: 60px 20px;
-            text-align: center;
-            border-bottom: 4px solid var(--primary);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .report-header h1 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-bottom: 15px;
-            background: linear-gradient(90deg, #60a5fa, #34d399);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .report-header p {
-            font-size: 1.1rem;
-            color: #94a3b8;
-            max-width: 800px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292e;
+            max-width: 900px;
             margin: 0 auto;
+            padding: 30px 20px;
         }
-
-        .header-meta {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-
-        .meta-tag {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 6px 16px;
-            border-radius: 30px;
-            font-size: 0.875rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        /* Layout Container */
-        .container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 24px;
-        }
-
-        .main-content {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            padding: 48px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-        }
-
-        /* Headings */
-        h1, h2, h3, h4, h5 {
-            font-family: 'Outfit', sans-serif;
-            color: var(--text-main);
-            font-weight: 700;
-            line-height: 1.3;
-        }
-
-        h2 {
-            font-size: 1.75rem;
-            margin-top: 48px;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--border-color);
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        h3 {
-            font-size: 1.35rem;
-            margin-top: 32px;
-            margin-bottom: 16px;
-            color: #1e293b;
-        }
-
-        h4 {
-            font-size: 1.1rem;
+        h1, h2, h3, h4 {
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 0.3em;
             margin-top: 24px;
-            margin-bottom: 12px;
-            color: #334155;
-        }
-
-        p {
             margin-bottom: 16px;
-            color: #334155;
         }
-
-        /* Blockquotes / Callouts */
-        blockquote {
-            background: #f0f9ff;
-            border-left: 4px solid var(--primary);
-            padding: 16px 20px;
-            border-radius: 0 var(--radius-md) var(--radius-md) 0;
-            margin: 24px 0;
-            color: #1e40af;
-            font-style: italic;
-        }
-
-        blockquote p {
-            margin-bottom: 0;
-        }
-
-        /* Lists */
-        ul, ol {
-            margin-bottom: 20px;
-            padding-left: 28px;
-            color: #334155;
-        }
-
-        li {
-            margin-bottom: 8px;
-        }
-
-        /* Tables */
         table {
-            width: 100%;
             border-collapse: collapse;
-            margin: 28px 0;
-            font-size: 0.95rem;
-            background: #ffffff;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
+            width: 100%;
+            margin: 16px 0;
         }
-
-        th {
-            background: #f1f5f9;
-            color: #0f172a;
-            font-weight: 600;
-            text-align: left;
-            padding: 14px 16px;
-            border-bottom: 2px solid var(--border-color);
+        th, td {
+            border: 1px solid #dfe2e5;
+            padding: 6px 13px;
         }
-
-        td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-            color: #334155;
+        tr:nth-child(2n) {
+            background-color: #f6f8fa;
         }
-
-        tr:nth-child(even) td {
-            background-color: #f8fafc;
-        }
-
-        tr:hover td {
-            background-color: #f1f5f9;
-        }
-
-        /* Images & Visualizations */
         img {
             max-width: 100%;
             height: auto;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            margin: 20px 0 10px 0;
-            display: block;
-            border: 1px solid var(--border-color);
         }
-
-        em {
-            display: block;
-            text-align: center;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-            font-style: normal;
-        }
-
-        /* Code & Pre */
         code {
-            font-family: 'Fira Code', monospace;
-            background: #f1f5f9;
-            color: #0f172a;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.9em;
+            background-color: rgba(27,31,35,0.05);
+            border-radius: 3px;
+            font-size: 85%;
+            padding: 0.2em 0.4em;
         }
-
         pre {
-            background: #0f172a;
-            color: #f8fafc;
-            padding: 20px;
-            border-radius: var(--radius-md);
-            overflow-x: auto;
-            margin: 24px 0;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9em;
+            background-color: #f6f8fa;
+            border-radius: 3px;
+            padding: 16px;
+            overflow: auto;
         }
-
-        pre code {
-            background: none;
-            color: inherit;
-            padding: 0;
-        }
-
-        /* Mermaid Container */
-        .mermaid-container {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 24px;
-            margin: 28px 0;
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            justify-content: center;
-        }
-
-        .mermaid {
-            width: 100%;
-            text-align: center;
-        }
-
-        /* Links */
-        a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Back to top button */
-        .top-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--primary);
-            color: #fff;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-lg);
-            cursor: pointer;
-            border: none;
-            transition: transform 0.2s, background 0.2s;
-            z-index: 1000;
-        }
-
-        .top-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-3px);
-        }
-
-        /* Footer */
-        .report-footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            border-top: 1px solid var(--border-color);
-            margin-top: 60px;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 24px;
-            }
-            .report-header h1 {
-                font-size: 1.8rem;
-            }
+        blockquote {
+            border-left: 0.25em solid #dfe2e5;
+            color: #6a737d;
+            padding: 0 1em;
+            margin: 0;
         }
     </style>
 </head>
 <body>
-
-    <header class="report-header">
-        <h1>BÁO CÁO TỔNG KẾT ĐỒ ÁN MÔN THỊ GIÁC MÁY TÍNH (HK253)</h1>
-        <p>Phân loại Ảnh Các Công trình Di sản Kiến trúc tại TP. Hồ Chí Minh sử dụng CNNs & Vision Transformers</p>
-        <div class="header-meta">
-            <span class="meta-tag">Môn học: Thị giác Máy tính (HK253)</span>
-            <span class="meta-tag">Repository: dpduc313/architectural_classifier</span>
-            <span class="meta-tag">Ngày hoàn thành: 03/08/2026</span>
-        </div>
-    </header>
-
-    <div class="container">
-        <main class="main-content">
-            <h1 id="bao-cao-tong-ket-o-an-mon-thi-giac-may-tinh-hk253">BÁO CÁO TỔNG KẾT ĐỒ ÁN MÔN THỊ GIÁC MÁY TÍNH (HK253)</h1>
-<h1 id="master-report-he-thong-phan-loai-anh-cac-cong-trinh-di-san-kien-truc-tai-tp-ho-chi-minh">MASTER REPORT: HỆ THỐNG PHÂN LOẠI ẢNH CÁC CÔNG TRÌNH DI SẢN KIẾN TRÚC TẠI TP. HỒ CHÍ MINH</h1>
-<blockquote>
-<p><strong>Tên đề tài:</strong> Xây dựng và đánh giá các mô hình CNN &amp; Vision Transformer trong phân loại ảnh các công trình di sản kiến trúc tại TP. HCM<br />
-<strong>Môn học:</strong> Thị giác máy tính (Computer Vision) - HK253<br />
-<strong>Repository:</strong> <a href="https://github.com/dpduc313/architectural_classifier">dpduc313/architectural_classifier</a><br />
-<strong>Ngày hoàn thành:</strong> 03/08/2026</p>
-<p><strong>Bản xem thuận tiện:</strong> <a href="./results/master_report.pdf">PDF</a> | <a href="./results/master_report.html">HTML</a></p>
-</blockquote>
 <hr />
 <h2 id="muc-luc">MỤC LỤC</h2>
 <ol>
@@ -408,21 +104,21 @@
 <h4 id="cau-truc-va-thach-thuc-tu-du-lieu-goc-ban-au">Cấu trúc và Thách thức từ Dữ liệu Gốc Ban đầu:</h4>
 <ul>
 <li><strong>Quy mô Dữ liệu Gốc Ban đầu (Initial Raw Dataset &gt;10,000 Photos):</strong></li>
-<li>Bộ dữ liệu ban đầu tập hợp <strong>10,000+ bức ảnh toàn cảnh</strong> các công trình kiến trúc (tương ứng 137 thư mục tòa nhà độc lập) tại TP.HCM và Hà Nội, với kích thước ảnh rất lớn (lên tới $6000 \times 4000$ pixels).</li>
+<li>Bộ dữ liệu ban đầu tập hợp <strong>10,000+ bức ảnh</strong> các công trình kiến trúc (tương ứng 137 thư mục tòa nhà độc lập) tại TP.HCM và Hà Nội.</li>
 <li><strong>Quy trình Lọc Nhiễu Sơ bộ bằng Vector Embedding DINOv2 (Near-Duplicate &amp; Outlier Detection):</strong></li>
 <li>Để giải quyết vấn đề ảnh trùng lặp và ảnh rác ngoại lệ ngay từ ảnh gốc, hệ thống sử dụng module <a href="execution/compute_embeddings.py">execution/compute_embeddings.py</a> trích xuất <strong>DINOv2 Feature Embeddings</strong> cho toàn bộ 10,000+ bức ảnh gốc:<ol>
-<li><em>Lọc Ảnh Trùng lặp (Near-Duplicate Detection - <a href="execution/detect_duplicates.py">execution/detect_duplicates.py</a>):</em> Tính <strong>Cosine Similarity</strong> giữa các vectơ biểu diễn DINOv2 trong không gian đặc trưng. Áp dụng ngưỡng tương đồng <code>similarity_threshold = 0.95</code> kết hợp với thuật toán <strong>Union-Find Clustering</strong> để gom nhóm và loại bỏ các bức ảnh gần như trùng lặp.</li>
-<li><em>Lọc Ảnh Ngoại lệ / Dị biệt (Outlier Detection - <a href="execution/detect_outliers.py">execution/detect_outliers.py</a>):</em> Tính khoảng cách <strong>Cosine Distance</strong> giữa vectơ DINOv2 của từng ảnh với <strong>Vectơ Tâm Lớp (Class Centroid Vector)</strong> của lớp phong cách tương ứng. Phát hiện và lọc bớt 5% ảnh ngoại lệ xa tâm nhất (các bức ảnh chụp quá xa, mờ nhòe hoặc không mang đặc trưng đại diện cho phong cách).</li>
+<li><em>Lọc Ảnh Trùng lặp (Near-Duplicate Detection - <a href="execution/detect_duplicates.py">execution/detect_duplicates.py</a>):</em> Tính <strong>Cosine Similarity</strong> giữa các vector biểu diễn DINOv2 trong không gian đặc trưng. Áp dụng ngưỡng tương đồng <code>similarity_threshold = 0.95</code> kết hợp với thuật toán <strong>Union-Find Clustering</strong> để gom nhóm và loại bỏ các bức ảnh gần như trùng lặp trong cùng một thư mục.</li>
+<li><em>Lọc Ảnh Ngoại lệ / Dị biệt (Outlier Detection - <a href="execution/detect_outliers.py">execution/detect_outliers.py</a>):</em> Tính khoảng cách <strong>Cosine Distance</strong> giữa vector DINOv2 của từng ảnh với <strong>Vector Tâm Lớp (Class Centroid Vector)</strong> của lớp phong cách tương ứng. Phát hiện và lọc bớt 5% ảnh ngoại lệ xa tâm nhất (các bức ảnh chụp quá xa, mờ nhòe hoặc không mang đặc trưng đại diện cho phong cách).</li>
 </ol>
 </li>
 <li><em>Kết quả Lọc Sơ bộ:</em>  Phát hiện và xử lý chính xác 314 outliers, 897 duplicates, giữ lại tổng cộng khoảng 9500 ảnh gốc.</li>
+<li><strong>5 Thách thức Cốt lõi của Dữ liệu Gốc Ban đầu:</strong></li>
+<li><em>Ảnh Kích thước Lớn &amp; Mất mát Thông tin:</em> Việc đưa 9500 bức ảnh $6000 \times 4000$ trực tiếp vào mạng Deep Learning gần như chắc chắn sẽ gây quá tải VRAM GPU, trong khi đó nếu nén ảnh trực tiếp (downscale) về $224 \times 224$ sẽ làm toàn bộ chi tiết hoa văn vi mô quý giá (phào chỉ, cửa vòm, đầu đao) bị nhòe và biến mất hoàn toàn. Chưa kể đến bài toán crop/distort ảnh gốc hình chữ nhật thành hình vuông. </li>
+<li><em>Mất Cân bằng Lớp Nghiêm trọng (Class Imbalance):</em> Số lượng mẫu giữa 4 lớp phong cách có sự chênh lệch lớn (lớp A1 Pháp cổ và B1 Hiện đại chiếm số lượng áp đảo so với A2 Tân cổ điển và B2 Đương đại), tiềm ẩn nguy cơ gây ra hiện tượng thiên vị (bias) trong quá trình mô hình phân loại.</li>
+<li><em>Hạn chế về Số lượng Tòa nhà (<code>building_id</code> Diversity):</em> Tổng số lượng công trình chuẩn hóa chỉ có 102 tòa nhà. Nếu phân chia dữ liệu ngẫu nhiên theo patch thay vì theo <code>building_id</code>, mô hình sẽ bị <strong>Rò rỉ Dữ liệu (Data Leakage)</strong> nghiêm trọng và "học thuộc" bối cảnh tòa nhà thay vì học phong cách kiến trúc.</li>
+<li><em>Nhiễu Bối cảnh Đô thị Phức tạp (Urban Noise):</em> Bức ảnh chụp thực tế chứa lượng lớn thành phần không liên quan: bầu trời rộng lớn, mạng lưới dây điện chăng chịt, cột điện, mặt đường nhựa, xe cộ và cây cối che khuất mặt tiền.</li>
 <li>
-<p><strong>5 Thách thức Cốt lõi của Dữ liệu Gốc Ban đầu:</strong>
-  1. <em>Ảnh Kích thước Rất lớn &amp; Mất mát Thông tin:</em> Việc đưa 9500 bức ảnh $6000 \times 4000$ trực tiếp vào mạng Deep Learning gây quá tải VRAM GPU, còn nếu nén ảnh trực tiếp (downscale) về $224 \times 224$ sẽ làm toàn bộ chi tiết hoa văn vi mô quý giá (phào chỉ, cửa vòm, đầu đao) bị nhòe và biến mất hoàn toàn.
-  2. <em>Mất Cân bằng Lớp Nghiêm trọng (Class Imbalance):</em> Số lượng mẫu giữa 4 lớp phong cách có sự chênh lệch lớn (lớp A1 Pháp cổ và B1 Hiện đại chiếm số lượng áp đảo so với A2 Tân cổ điển và B2 Đương đại), gây ra hiện tượng thiên vị (bias) trong quá trình mô hình phân loại.
-  3. <em>Hạn chế về Số lượng Tòa nhà (<code>building_id</code> Diversity):</em> Tổng số lượng công trình chuẩn hóa chỉ có 102 tòa nhà. Nếu phân chia dữ liệu ngẫu nhiên theo patch thay vì theo <code>building_id</code>, mô hình sẽ bị <strong>Rò rỉ Dữ liệu (Data Leakage)</strong> nghiêm trọng và "học thuộc" bối cảnh tòa nhà thay vì học phong cách kiến trúc.
-  4. <em>Nhiễu Bối cảnh Đô thị Phức tạp (Urban Noise):</em> Bức ảnh chụp thực tế chứa lượng lớn thành phần không liên quan: bầu trời rộng lớn, mạng lưới dây điện chăng chịt, cột điện, mặt đường nhựa, xe cộ và cây cối che khuất mặt tiền.
-  5. <em>Nhiễu do Điều kiện Chụp Đa dạng (Shooting Variance):</em></p>
+<p><em>Nhiễu do Điều kiện Chụp Đa dạng (Shooting Variance):</em></p>
 <ul>
 <li><strong>Góc chụp biến thiên:</strong> Ảnh chụp trực diện, góc nghiêng, chụp từ dưới lên (low-angle) hoặc chụp từ xa.</li>
 <li><strong>Thời gian &amp; Ánh sáng chụp:</strong> Thời điểm chụp khác nhau (nắng gắt, cháy sáng, bóng râm, chạng vạng) và ảnh tư liệu lịch sử bị mất màu hoặc mờ nét.</li>
@@ -430,24 +126,23 @@
 </ul>
 </li>
 <li>
-<p><strong>Chiến lược Phân mảnh Ảnh (Patching Strategy - Từ ~10k Ảnh Gốc thành 183,674 Patches):</strong></p>
+<p><strong>Chiến lược Phân mảnh Ảnh:</strong></p>
 </li>
-<li>Nhận thấy ảnh gốc kích thước lớn ($6000 \times 4000$) là một <strong>cơ hội tuyệt vời để làm tăng tính đa dạng mẫu và phong cách (sample &amp; style diversity)</strong>, nhóm nghiên cứu đã áp dụng kỹ thuật phân mảnh ảnh.</li>
 <li>Mỗi bức ảnh $6000 \times 4000$ được chia nhỏ thành các patch hình vuông có kích thước <strong>$1000 \times 1000$ pixels</strong>.</li>
-<li><strong>Ưu điểm của Tỷ lệ Hình vuông $1:1$:</strong> Giúp quá trình rescale về kích thước đầu vào tiêu chuẩn của các mô hình học sâu ($224 \times 224$ cho ResNet/ViT/DINOv2 hoặc $384 \times 384$ cho Swin V2) diễn ra tự nhiên, <strong>hoàn toàn không bị biến dạng tỷ lệ (no distortion)</strong>, không cần thêm viền đen (zero-padding) hay cắt bỏ lề (center crop loss).</li>
+<li><strong>Ưu điểm của Tỷ lệ Hình vuông $1:1$:</strong> Giúp quá trình rescale về kích thước đầu vào tiêu chuẩn của các mô hình học sâu ($224 \times 224$ cho ResNet/ViT/DINOv2 hoặc $384 \times 384$ cho Swin V2) diễn ra tự nhiên, <strong>hoàn toàn không bị biến dạng tỷ lệ</strong>, không cần thêm viền đen hay cắt bỏ lề.</li>
 <li>
-<p><strong>Kết quả Chuyển đổi:</strong> Biến bộ dữ liệu ảnh gốc ban đầu (~10,000 ảnh) thành bộ dữ liệu khổng lồ <strong>183,674 patches</strong>, ép các mô hình tập trung trích xuất sâu các chi tiết kiến trúc vi mô (mái ngói âm dương, bờ gờ uốn cong, phào chỉ, hoa văn vòm cửa, mảng kính) thay vì thông tin nền không liên quan.</p>
+<p><strong>Kết quả Chuyển đổi:</strong> Biến bộ dữ liệu ảnh gốc ban đầu thành bộ dữ liệu khổng lồ <strong>183,674 patches</strong>, ép các mô hình tập trung trích xuất sâu các chi tiết kiến trúc vi mô (mái ngói âm dương, bờ gờ uốn cong, phào chỉ, hoa văn vòm cửa, mảng kính) thay vì thông tin nền không liên quan.</p>
 </li>
 <li>
-<p><strong>Quá trình Lọc 183,674 Patches qua 2 Phương pháp &amp; Tác động đến Kết quả Huấn luyện (Tham chiếu Chương 3 &amp; Chương 5):</strong>
-  1. <em>Phương pháp 1: Lọc Tự động bằng YOLOv8 (Kiến trúc Phân đoạn Tòa nhà):</em></p>
-<ul>
+<p><strong>Quá trình Lọc 183,674 Patches qua 2 Phương pháp &amp; Tác động đến Kết quả Huấn luyện (Tham chiếu Chương 3 &amp; Chương 5):</strong></p>
+</li>
+<li><em>Phương pháp 1: Lọc Tự động bằng YOLOv8 (Kiến trúc Phân đoạn Tòa nhà):</em><ul>
 <li><strong>Mô hình &amp; Tham số:</strong> Sử dụng mô hình YOLOv8m tiền huấn luyện phân đoạn tòa nhà (<code>keremberke/yolov8m-building-segmentation</code> trên Hugging Face), chạy suy luận với ngưỡng tin cậy <code>conf = 0.25</code>.</li>
 <li><strong>Logic Tính toán:</strong> Đối với mỗi patch $1000 \times 1000$, mô hình trích xuất các mặt nạ phân đoạn (segmentation masks). Hệ thống gộp các mặt nạ dự đoán thành một mặt nạ nhị phân duy nhất $M$:
    $$M = \bigvee_{i=1}^{K} (Mask_i &gt; 0.5)$$
    Tỷ lệ diện tích tòa nhà (Building Ratio) được tính bằng trung bình số pixel của mặt nạ gộp trên tổng số pixel của patch:
    $$\text{Building Ratio} = \frac{1}{H \times W} \sum_{y=1}^{H} \sum_{x=1}^{W} M(y, x)$$
-   Patch được giữ lại nếu tỷ lệ diện tích tòa nhà đạt tối thiểu 1.8% (<code>building_ratio &gt;= 0.018</code>).</li>
+   Patch được giữ lại nếu tỷ lệ diện tích tòa nhà đạt tối thiểu ngưỡng (<code>building_ratio &gt;= threshold</code>).</li>
 <li><strong>Kết quả Lọc lần đầu:</strong> Giữ lại <strong>85,991 patches</strong> và loại bỏ <strong>97,683 patches</strong> vào pool rác.</li>
 <li><strong>Kết quả Huấn luyện Thử nghiệm Đợt 1 (trên 86k patches do YOLOv8 lọc):</strong></li>
 </ul>
@@ -522,21 +217,21 @@
 </tr>
 </tbody>
 </table>
-<p><img alt="Kết quả huấn luyện trên 86k patches do YOLOv8 lọc" src="./outputs/figures/yolo_phase1_results.png" /><br />
-<em>Hình 1.1: Bảng kết quả đánh giá hiệu năng thử nghiệm Đợt 1 trên 85,991 patches do YOLOv8 lọc tự động. Kết quả cho thấy mô hình tốt nhất (DINOv2-S) chỉ đạt 52.20% Test Accuracy và Macro-F1 0.4980, bị giới hạn nặng nề bởi nhiễu và việc mất mát thông tin.</em></p>
-<pre><code> - **Hạn chế:** YOLOv8 chỉ học nhận diện hình dáng tổng thể của cả tòa nhà (cửa ra vào, tường ngoài, mái lớn). Do đó, mô hình này bị "mù màu" đối với các **chi tiết kiến trúc vi mô** (hoa văn điêu khắc Pháp cổ, bờ đao, phào chỉ nhỏ, hoa văn cổng sắt di sản) nằm trong các patch chụp cận cảnh, dẫn tới việc loại bỏ sai hàng chục nghìn mẫu vật có giá trị học sâu cao và làm hiệu năng phân loại bị kìm hãm dưới mức 53%.
-</code></pre>
-<ol start="2">
-<li><em>Phương pháp 2: Quy trình Kiểm duyệt Thủ công 100% (100% Full Manual Human Curation Protocol):</em><ul>
-<li>Nhóm nghiên cứu thực hiện review thủ công 100% toàn bộ <strong>183,674 patches</strong> ở cả 2 danh mục, phân loại nhãn phụ nhị phân <code>architectural</code> ($1$) vs <code>non-architectural</code> ($0$).</li>
-<li><em>Kết quả đột phá:</em> <strong>Cứu lại được 32,479 patches kiến trúc quý giá</strong> bị YOLOv8 đánh giá nhầm là rác, nâng tổng số patch kiến trúc chuẩn lên <strong>118,470 patches (64.5%)</strong>, đồng thời cô lập triệt để 65,204 patches nhiễu (bầu trời, dây điện, cột điện).</li>
-<li><em>Tác động đến Hiệu năng Huấn luyện (Tham chiếu Chương 5):</em> Việc huấn luyện trên tập dữ liệu đã qua Curation 100% kết hợp với Thuật toán Biểu quyết Cấp độ Ảnh Gốc đã giúp mô hình <strong>Swin Transformer V2 đạt 96.50% Voting Acc</strong> và <strong>Meta DINOv2 đạt 95.80% Voting Acc</strong>, vượt trội hoàn toàn so với việc chỉ huấn luyện trên tập YOLO sơ khai.</li>
+<p><em>Bảng 1: Bảng kết quả đánh giá hiệu năng thử nghiệm trên 85,991 patches do YOLOv8 lọc tự động. Kết quả cho thấy mô hình tốt nhất (DINOv2-S) chỉ đạt 52.20% Test Accuracy và Macro-F1 0.4980, bị giới hạn nặng nề bởi nhiễu và việc mất mát thông tin.</em></p>
+<p>Điều này chỉ ra rằng, việc patching dữ liệu khiến một hình ảnh gốc được chia nhỏ thành 24 hình, 24 hình này sau đó dều được gắn nhãn giống như hình gốc, trong khi chỉ có một phần diện tích của hình gốc là chứa kiến trúc, còn lại là nhiễu nền, dẫn tới các patch không chứa thông tin kiến trúc coi như đang bị gắn sai nhãn, ảnh hưởng đến cả quá trình học của mô hình lẫn tính khách quan của test set và val set.</p>
+<ol>
+<li>
+<p><em>Phương pháp 2: Quy trình Kiểm duyệt Thủ công 100% (100% Full Manual Human Curation Protocol):</em></p>
+<ul>
+<li>Toàn bộ <strong>183,674 patches</strong> sẽ được gắn 1 trong 2 loại nhãn phụ nhị phân <code>architectural</code> ($1$) vs <code>non-architectural</code> ($0$), quá trình dán nhãn được thực hiện thủ công hoàn toàn bởi con người. </li>
+<li><em>Kết quả:</em> <strong>Hiệu chỉnh lại nhãn cho 32,479 patches kiến trúc quý giá</strong> bị YOLOv8 đánh giá nhầm là rác, nâng tổng số patch kiến trúc chuẩn lên <strong>118,470 patches (64.5%)</strong>, đồng thời cô lập triệt để 65,204 patches nhiễu (bầu trời, dây điện, cột điện).</li>
+<li><em>Tác động đến Hiệu năng Huấn luyện (Tham chiếu Chương 5):</em> Việc huấn luyện trên tập dữ liệu đã qua Curation 100% kết hợp với Thuật toán Biểu quyết Cấp độ Ảnh Gốc đã giúp mô hình <strong>Swin Transformer V2 đạt 96.50% Voting Acc</strong> và <strong>Meta DINOv2 đạt 95.80% Voting Acc</strong>, vượt trội hoàn toàn so với việc chỉ huấn luyện trên dữ liệu được lọc bởi YOLO (lần lượt khoảng 50% và 49% trên test set).</li>
 </ul>
 </li>
+<li>
+<p><strong>Thách thức Rò rỉ Dữ liệu (Data Leakage):</strong> Nếu phân chia ngẫu nhiên (Random Split) các patch mà không gom nhóm theo từng tòa nhà gốc, các patch cùng một công trình sẽ xuất hiện đồng thời ở cả tập Train và Test, khiến mô hình bị "học thuộc" và cho kết quả ảo. Do đó, hệ thống áp dụng chia theo ID Tòa nhà (70% Train / 15% Val / 15% Test).</p>
+</li>
 </ol>
-<ul>
-<li><strong>Thách thức Rò rỉ Dữ liệu (Data Leakage):</strong> Nếu phân chia ngẫu nhiên (Random Split) các patch mà không gom nhóm theo từng tòa nhà gốc, các patch cùng một công trình sẽ xuất hiện đồng thời ở cả tập Train và Test, khiến mô hình bị "học thuộc" và cho kết quả ảo. Do đó, hệ thống áp dụng chia theo ID Tòa nhà (70% Train / 15% Val / 15% Test).</li>
-</ul>
 <hr />
 <h3 id="13-muc-tieu-e-tai-chien-luoc-so-sanh-mo-hinh-project-goals-model-suite-strategy">1.3 Mục tiêu Đề tài &amp; Chiến lược So sánh Mô hình (Project Goals &amp; Model Suite Strategy)</h3>
 <h4 id="1-xay-dung-bo-suite-gom-4-mo-hinh-hoc-sau">1. Xây dựng Bộ Suite gồm 4 Mô hình Học sâu:</h4>
@@ -576,11 +271,11 @@
 - <strong>B1:</strong> Pre-1986 Modern (Kiến trúc hiện đại / Nhiệt đới trước 1986).
 - <strong>B2:</strong> Post-1986 Modern (Kiến trúc hiện đại đương đại sau 1986).</p>
 <h3 id="32-e-xuat-cach-anh-nhan-tinh-chinh-du-lieu-100-novel-100-full-dataset-curation-protocol-iem-cong">3.2 Đề xuất Cách Đánh nhãn &amp; Tinh chỉnh Dữ liệu 100% (Novel 100% Full Dataset Curation Protocol - điểm cộng)</h3>
-<p>Nhận thấy việc tự động cắt patch bằng YOLOv8 ($\ge 1.8\%$) bỏ sót nhiều patch chứa họa tiết kiến trúc quý giá đồng thời giữ lại nhiều patch rác (bầu trời, dây điện), nhóm nghiên cứu đã xây dựng quy trình <strong>Curation thủ công 100% cho 183,674 patches</strong>:</p>
-<div class="mermaid-container"><pre class="mermaid">
+<p>Nhận thấy việc tự động cắt patch bằng YOLOv8 bỏ sót nhiều patch chứa họa tiết kiến trúc quý giá đồng thời giữ lại nhiều patch rác (bầu trời, dây điện), nhóm nghiên cứu đã xây dựng quy trình <strong>Curation thủ công 100% cho 183,674 patches</strong>:</p>
+<pre class="mermaid">
 flowchart TD
-    Raw["Full Master Dataset: 183,674 Patches"] --> PoolA["YOLO >= 1.8% Pool: 85,991 Patches"]
-    Raw --> PoolB["YOLO < 1.8% Pool: 97,683 Patches"]
+    Raw["Full Master Dataset: 183,674 Patches"] --> PoolA["YOLO Kept Pool: 85,991 Patches"]
+    Raw --> PoolB["YOLO Removed Pool: 97,683 Patches"]
 
     PoolA -->|"Manual Human Curation 100%"| KeptClean["Kept Architectural: 85,991 Patches"]
     PoolB -->|"Manual Human Curation 100%"| Rescued["Rescued Architectural: 32,479 Patches"]
@@ -589,13 +284,13 @@ flowchart TD
     KeptClean --> FinalArch["True Curated Dataset: 118,470 Architectural Patches (Sub-label 1)"]
     Rescued --> FinalArch
     FilteredNoise --> NonArch["Noise / Sky Dataset: 65,204 Non-Architectural Patches (Sub-label 0)"]
-</pre></div>
+</pre>
 
-<h4 id="3-tieu-chi-loc-du-lieu-nghiem-ngat">3 Tiêu chí Lọc Dữ liệu Nghiêm ngặt:</h4>
+<h4 id="tieu-chi-loc-du-lieu">Tiêu chí Lọc Dữ liệu:</h4>
 <ol>
-<li><strong>Thông tin Kiến trúc (Architectural Information):</strong> Patch phải chứa thông tin rõ ràng (tường, ngói, phù điêu, hoa văn cửa vòm, màu sơn) đại diện cho phong cách.</li>
-<li><strong>Kiểm soát Nhiễu (Noise Control):</strong> Loại bỏ patch chứa rác đô thị: cây cối ngoài công trình, thùng rác, xe cộ, <strong>dây điện, cột điện, mặt đường và bầu trời</strong>.</li>
-<li><strong>Chất lượng Ảnh (Image Quality):</strong> Loại bỏ patch mờ nét, nhòe chuyển động, cháy sáng hoặc quá tối.</li>
+<li><strong>Thông tin Kiến trúc:</strong> Patch phải chứa thông tin rõ ràng (tường, ngói, phù điêu, hoa văn cửa vòm, màu sơn) đại diện cho phong cách.</li>
+<li><strong>Loại bỏ Nhiễu:</strong> Loại bỏ patch chứa rác đô thị: cây cối ngoài công trình, thùng rác, xe cộ, dây điện, cột điện, mặt đường và bầu trời.</li>
+<li><strong>Chất lượng Ảnh:</strong> Loại bỏ patch mờ nét, nhòe chuyển động, cháy sáng hoặc quá tối.</li>
 </ol>
 <h4 id="bang-thong-ke-curation-at-uoc">Bảng Thống kê Curation Đạt được:</h4>
 <table>
@@ -611,7 +306,7 @@ flowchart TD
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;"><strong>Kept Pool (YOLO $\ge$ 1.8%)</strong></td>
+<td style="text-align: left;"><strong>Kept Pool</strong></td>
 <td style="text-align: center;">85,991</td>
 <td style="text-align: center;">85,991</td>
 <td style="text-align: center;">85,991</td>
@@ -619,7 +314,7 @@ flowchart TD
 <td style="text-align: center;">100.00%</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>Filtered Pool (YOLO &lt; 1.8%)</strong></td>
+<td style="text-align: left;"><strong>Filtered Pool</strong></td>
 <td style="text-align: center;">97,683</td>
 <td style="text-align: center;">97,683</td>
 <td style="text-align: center;">32,479 (Cứu lại)</td>
@@ -650,7 +345,7 @@ flowchart TD
 <h2 id="chuong-4-phuong-phap-nghien-cuu-kien-truc-mo-hinh-methodology">CHƯƠNG 4: PHƯƠNG PHÁP NGHIÊN CỨU &amp; KIẾN TRÚC MÔ HÌNH (METHODOLOGY)</h2>
 <h3 id="41-bo-suite-cac-mo-hinh-so-sanh-model-suite">4.1 Bộ Suite Các Mô hình So sánh (Model Suite)</h3>
 <p>Nhóm triển khai và so sánh 4 mô hình tiêu biểu đại diện cho các trường phái:</p>
-<div class="mermaid-container"><pre class="mermaid">
+<pre class="mermaid">
 flowchart TD
     %% Styling Rules
     classDef inputStyle fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1
@@ -658,22 +353,22 @@ flowchart TD
     classDef headStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#bf360c
     classDef outputStyle fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#1b5e20
 
-    subgraph Stage1["1. Giai đoạn Đầu vào (Input Layer)"]
+    subgraph Stage1["1. Input Layer"]
         InputPatch["Patch Ảnh Kiến trúc<br/><i>Rescaled 224x224 / 384x384</i>"]:::inputStyle
     end
 
-    subgraph Stage2["2. Bộ Suite 4 Mô hình Trích xuất Đặc trưng (Backbone Suite)"]
+    subgraph Stage2["2. Mô hình Trích xuất Đặc trưng"]
         ResNet50["<b>ResNet-50</b><br/><i>Baseline CNN</i>"]:::modelStyle
         ViT["<b>Vision Transformer (ViT-B/16)</b><br/><i>Flat Patch Attention</i>"]:::modelStyle
         DINOv2["<b>Meta DINOv2</b><br/><i>Self-Supervised ViT</i>"]:::modelStyle
         Swinv2["<b>Swin Transformer V2</b><br/><i>Shifted Window Attention</i>"]:::modelStyle
     end
 
-    subgraph Stage3["3. Đầu Phân loại Đa nhiệm (Dual Multi-Task Classifier Head)"]
+    subgraph Stage3["3. Multi-Task Classifier Head"]
         FCHead["<b>Shared Linear Layer & Dropout</b><br/><i>Tổng hợp Vectơ Đặc trưng</i>"]:::headStyle
     end
 
-    subgraph Stage4["4. Kết quả Đầu ra Đa nhiệm (Multi-Task Outputs)"]
+    subgraph Stage4["4. Output"]
         OutputStyle["<b>Nhiệm vụ 1 (Chính):</b><br/>Phân loại 4 Phong cách Kiến trúc<br/>(A1, A2, B1, B2)"]:::outputStyle
         OutputArch["<b>Nhiệm vụ 2 (Nhãn phụ):</b><br/>Lọc Nhiễu Nhị phân<br/>(Architectural vs Non-Architectural)"]:::outputStyle
     end
@@ -682,7 +377,7 @@ flowchart TD
     InputPatch --> ResNet50 & ViT & DINOv2 & Swinv2
     ResNet50 & ViT & DINOv2 & Swinv2 --> FCHead
     FCHead --> OutputStyle & OutputArch
-</pre></div>
+</pre>
 
 <ol>
 <li><strong>ResNet-50 (<code>resnet50.a1_in1k</code>):</strong> Mạng CNN 50 lớp với các khối Residual Block, làm baseline đối chứng.</li>
@@ -774,7 +469,7 @@ flowchart TD
 <p><img alt="Phân bố F1 theo từng lớp kiến trúc" src="./outputs/figures/per_class_f1_chart.png" /><br />
 <em>Hình 4: Phân tích chỉ số F1-Score theo từng lớp phong cách kiến trúc chi tiết đợt 3 (A1, A2, B1, B2) giữa 4 mô hình.</em></p>
 <h3 id="52-phan-tich-sau-2-mo-hinh-tot-nhat-ot-3-swin-v2-vs-meta-dinov2">5.2 Phân tích Sâu 2 Mô hình Tốt nhất Đợt 3: Swin V2 vs Meta DINOv2</h3>
-<div class="mermaid-container"><pre class="mermaid">
+<pre class="mermaid">
 gantt
     title So sánh Đặc tính Kỹ thuật giữa Swin V2 và DINOv2 Đợt 3
     dateFormat  X
@@ -790,7 +485,7 @@ gantt
     Độ chính xác Cấp Ảnh Gốc (95.80%) : active, d1, 0, 95
     Khả năng Tổng quát hóa (Ref 87.9%)  : active, d2, 0, 88
     Tốc độ Suy luận (9.2 ms/patch)       : active, d3, 0, 85
-</pre></div>
+</pre>
 
 <h4 id="1-swin-transformer-v2-swin_base_patch4_window12_384-mo-hinh-quan-quan-ot-3">1. Swin Transformer V2 (<code>swin_base_patch4_window12_384</code> - Mô hình Quán quân Đợt 3):</h4>
 <ul>
@@ -810,7 +505,7 @@ gantt
 <p>Grad-CAM tính toán bản đồ kích hoạt không gian dựa trên đạo hàm của điểm số lớp $y^c$ đối với các bản đồ đặc trưng $A^k$ tại lớp cuộn/transformer cuối cùng:</p>
 <p>$$\alpha_k^c = \frac{1}{Z} \sum_{i} \sum_{j} \frac{\partial y^c}{\partial A_{i,j}^k}$$</p>
 <p>$$L_{\text{Grad-CAM}}^c = \text{ReLU}\left( \sum_{k} \alpha_k^c A^k \right)$$</p>
-<div class="mermaid-container"><pre class="mermaid">
+<pre class="mermaid">
 flowchart LR
     Input["Input Patch Image"] --> Model["Swin V2 / DINOv2 Backbone"]
     Model --> FeatureMaps["Last Layer Feature Maps A_k"]
@@ -818,7 +513,7 @@ flowchart LR
     FeatureMaps --> ClassScore["Class Output Score y_c"]
     Gradients --> Heatmap["Grad-CAM Attention Heatmap"]
     Heatmap --> Overlay["Overlay Heatmap on Image"]
-</pre></div>
+</pre>
 
 <h4 id="611-truc-quan-hoa-ban-o-chu-y-grad-cam-4-lop-1-mau-ung-1-mau-sai">6.1.1 Trực quan hóa Bản đồ Chú ý Grad-CAM (4 Lớp: 1 Mẫu Đúng &amp; 1 Mẫu Sai)</h4>
 <p>Để chứng minh tính minh bạch và khả năng giải thích của mô hình, hệ thống trích xuất bản đồ kích hoạt Grad-CAM trên tập Test của mô hình tốt nhất cho toàn bộ 4 lớp phong cách. Mỗi lớp được phân tích đối chứng qua <strong>1 mẫu dự đoán ĐÚNG (True Positive)</strong> và <strong>1 mẫu dự đoán SAI (Misclassified)</strong>:</p>
@@ -921,6 +616,7 @@ flowchart LR
 <p><a id="chuong-8-tai-lieu-tham-khao"></a></p>
 <h2 id="tai-lieu-tham-khao-references">TÀI LIỆU THAM KHẢO (REFERENCES)</h2>
 <ol>
+<li><strong>Repository:</strong> <a href="https://github.com/dpduc313/architectural_classifier">dpduc313/architectural_classifier</a> </li>
 <li><strong>He, K., Zhang, X., Ren, S., &amp; Sun, J. (2016).</strong> Deep residual learning for image recognition. In <em>Proceedings of the IEEE conference on computer vision and pattern recognition (CVPR)</em> (pp. 770-778).</li>
 <li><strong>Dosovitskiy, A., et al. (2020).</strong> An image is worth 16x16 words: Transformers for image recognition at scale. <em>arXiv preprint arXiv:2010.11929</em>.</li>
 <li><strong>Liu, Z., et al. (2022).</strong> Swin transformer v2: Scaling up capacity and resolution. In <em>Proceedings of the IEEE/CVF conference on computer vision and pattern recognition (CVPR)</em> (pp. 12009-12019).</li>
@@ -928,16 +624,5 @@ flowchart LR
 <li><strong>Selvaraju, R. R., Cogswell, M., Das, A., Vedantam, R., Parikh, D., &amp; Batra, D. (2017).</strong> Grad-CAM: Visual explanations from deep networks via gradient-based localization. In <em>Proceedings of the IEEE international conference on computer vision (ICCV)</em> (pp. 618-626).</li>
 <li><strong>Lundberg, S. M., &amp; Lee, S. I. (2017).</strong> A unified approach to interpreting model predictions. <em>Advances in neural information processing systems (NeurIPS)</em>, 30.</li>
 </ol>
-        </main>
-
-        <footer class="report-footer">
-            <p>© 2026 Architectural Heritage Classifier Project. Antigravity Deep Learning Team.</p>
-        </footer>
-    </div>
-
-    <button class="top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Lên đầu trang">
-        ↑
-    </button>
-
 </body>
 </html>
