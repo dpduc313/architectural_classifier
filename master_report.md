@@ -164,7 +164,7 @@ flowchart TD
   - **Test Set (`.tmp/final_test_manifest.csv`):** 24,263 patches (15.3%) — 16 tòa nhà.
 - **Cô lập Tập Reference Benchmark Test Set:** Đưa 25,396 patches thuộc các thư mục nhãn chưa kiểm chứng (`HistoricVietnam-OldPics`, `Hanoi...`, `need_review`) vào file **`final_reference_test_manifest.csv`** (35 tòa nhà) làm tập benchmark đối chứng thực tế.
 
-![Biểu đồ phân bố dữ liệu](outputs/figures/dataset_distribution.png)  
+![Biểu đồ phân bố dữ liệu](./outputs/figures/dataset_distribution.png)  
 *Hình 1: Biểu đồ phân bố tỷ lệ patches theo các tập Train/Val/Test (70-15-15 Building-Level Group Split) và Phân bố tỷ lệ 4 lớp kiến trúc (A1, A2, B1, B2).*
 
 ---
@@ -232,13 +232,13 @@ Thực nghiệm được đánh giá đồng thời trên tập Test Chuẩn hó
 | **Vision Transformer (ViT)** (`vit_base_224`) | 224x224 | 91.20% | 0.9045 | 93.10% | 84.50% | 8.8 ms |
 | **ResNet-50** (`resnet50.a1`) | 224x224 | 86.40% | 0.8520 | 88.90% | 79.20% | **4.1 ms** |
 
-![Biểu đồ so sánh hiệu năng các mô hình](outputs/figures/model_comparison_chart.png)  
+![Biểu đồ so sánh hiệu năng các mô hình](./outputs/figures/model_comparison_chart.png)  
 *Hình 2: Biểu đồ so sánh trực quan hiệu năng giữa 4 mô hình (Standard Accuracy & Macro-F1) trên tập dữ liệu chuẩn hóa.*
 
-![Ma trận nhầm lẫn 4 mô hình](outputs/figures/confusion_matrices.png)  
+![Ma trận nhầm lẫn 4 mô hình](./outputs/figures/confusion_matrices.png)  
 *Hình 3: Lưới ma trận nhầm lẫn (Confusion Matrices Grid) đánh giá chi tiết tỷ lệ dự đoán đúng/sai giữa 4 lớp phong cách (A1, A2, B1, B2) cho cả 4 mô hình.*
 
-![Phân bố F1 theo từng lớp kiến trúc](outputs/figures/per_class_f1_chart.png)  
+![Phân bố F1 theo từng lớp kiến trúc](./outputs/figures/per_class_f1_chart.png)  
 *Hình 4: Phân tích chỉ số F1-Score theo từng lớp phong cách kiến trúc chi tiết (A1, A2, B1, B2) giữa 4 mô hình.*
 
 ### 5.2 Phân tích Sâu 2 Mô hình Tốt nhất: Swin V2 vs Meta DINOv2
